@@ -8,9 +8,9 @@ html
 body
 { font-family: "trebuchet ms", arial, sans-serif;
   font-size: .84em;
-  color: #651e6a; /* dark purple */
+  color: #251846; /* dark blue purple */
   line-height: 1.4em;
-  background: #531158; /* darkest purple */
+  background: #1f153a; /* darkest blue purple */
   width: 900px;
   margin: 10px auto 0px auto;}
   
@@ -101,32 +101,32 @@ ol li
 
 .accordion_headings
 { padding: 10px 25px 10px 25px;
-  background: #1e125e; /* super dark blue navy */
-  color: #dbc25b; /* bright yellow */
-  border-top: 1px solid #150c43; /* EVEN darker dark blue navy */
-  border-bottom: 1px solid #43397c; /* a lighter version on the darker dark */
+  background: #c80d5a; /* strong megenta pink */
+  color: #e2bd48; /* bright yellow */
+  border-top: 1px solid #a70950; /* main magenta pink plus some darkness */
+  border-bottom: 1px solid #d61e64; /* main magenta pink plus some lightness */
   cursor: pointer;
   font-size: 120%;
   position: relative;
   z-index: 20;}
 
 .accordion_headings:hover
-{ background: #06D4EC;
-  border-bottom: 1px solid #06D4EC;}
+{ background: #33ac5d; /* main green color */
+  border-bottom: 1px solid #3cc26b;} /* main green color plus some lightness */
 
 .accordion_child
 { padding: 25px;
-  background: #FFF;}
+  background: #f4a1c3;} /* main magenta color with super whiteness added */
 
 .header_highlight
-{ background: #06D4EC;
-  border-bottom: 1px solid #06D4EC;}
+{ background: #33ac5d;
+  border-bottom: 1px solid #3cc26b;}
 
 #logo
 { width: 100%;
   height: 78px;
   background: transparent;
-  color: #444;
+  color: #444; /* ???????? dunno what this is */
   position: relative;
   z-index: 10;
   padding-top: 15px;}
@@ -135,26 +135,26 @@ ol li
 { font: normal 600% 'century gothic', arial;
   padding: 0 0 0 20px;
   margin: 0;
-  color: #444;}
+  color: #444;} /* ???????? dunno what this is */
 
 #footer p
 { letter-spacing: 0.1em;
   text-transform: uppercase;
   text-align: center;
   padding: 20px;
-  color: #444;
+  color: #444; /* ???????? dunno what this is */
   font-size: 90%;}
 
 #footer a, #footer a:hover
-{ color: #76786A;
+{ color: #1c162e; /* a more gray version of the main dark purple */
   text-decoration: none;}
 
 #footer a:hover
-{ color: #FFF;}
+{ color: #f4a1c3;} /* main magenta color with super whiteness added */
 
 .search
-{ color: #5D5D5D; 
-  border: 1px solid #BBB; 
+{ color: #1f153a; /* darkest blue purple */ 
+  border: 1px solid #302254; /* lighter version of the blue purple above */ 
   width: 134px; 
   padding: 4px; 
   font: 100% arial, sans-serif;}
