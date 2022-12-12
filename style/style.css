@@ -8,14 +8,14 @@ html
 body
 { font-family: "trebuchet ms", arial, sans-serif;
   font-size: .84em;
-  color: #251846; /* dark blue purple */
+  color: #7e1a62; /* dark purple 3 */
   line-height: 1.4em;
-  background: #1f153a; /* darkest blue purple */
+  background: #73195a; /* dark purple 3.5 */
   width: 900px;
   margin: 10px auto 0px auto;}
   
 h1, h2, h3, h4, h5, h6 
-{ color: #64283e; /* dark pinkypurple */
+{ color: #7e1a62; /* dark purple 3 */
   letter-spacing: 0em;
   padding: 0 0 5px 0;}
 
@@ -23,25 +23,25 @@ h1, h2, h3
 { font: normal 150% 'lucida sans', arial;
   margin: 0 0 15px 0;
   padding: 0 0 5px 0;
-  color: #3b297b;} /* dark purple blue */
+  color: #9e196c;} /* dark purple 2 */
 
 h2
 { font-size: 140%;
   padding: 9px 0 5px 0;
-  color: #24906c;} /* darker of the main green */
+  color: #a4206c; /* dark purple 1 */
 
 h3
 { font-size: 140%;
   padding: 5px 0 0 0;}
 
 h4, h6
-{ color: #24906c; /* darker of the main green */
+{ color: #a4206c; /* dark purple 1 */
   padding: 0 0 5px 0;
   font: normal 110% arial;
   text-transform: uppercase;}
 
 h5, h6
-{ color: #cb2673; /* main lighest of the pinks */
+{ color: #a4206c; /* dark purple 1 */
   font: normal 95% arial;
   letter-spacing: normal;
   padding: 0 0 15px 0;}
@@ -101,22 +101,22 @@ ol li
 
 .accordion_headings
 { padding: 10px 25px 10px 25px;
-  background: #c80d5a; /* strong megenta pink */
-  color: #e2bd48; /* bright yellow */
-  border-top: 1px solid #a70950; /* main magenta pink plus some darkness */
-  border-bottom: 1px solid #d61e64; /* main magenta pink plus some lightness */
+  background: #c80d5a; /* main pink 2 */
+  color: #e2bd48; /* main yellow 2*/
+  border-top: 1px solid #a70950; /* main pink 3 */
+  border-bottom: 1px solid #d61e64; /* main pink 1 */
   cursor: pointer;
   font-size: 120%;
   position: relative;
   z-index: 20;}
 
 .accordion_headings:hover
-{ background: #33ac5d; /* main green color */
-  border-bottom: 1px solid #3cc26b;} /* main green color plus some lightness */
+{ background: #33ac5d; /* main green 2 */
+  border-bottom: 1px solid #7aad60;} /* main green 2 */
 
 .accordion_child
 { padding: 25px;
-  background: #f4a1c3;} /* main magenta color with super whiteness added */
+  background: #f8df91;} /* main yellow 1 */
 
 .header_highlight
 { background: #33ac5d;
@@ -126,7 +126,7 @@ ol li
 { width: 100%;
   height: 78px;
   background: transparent;
-  color: #444; /* ???????? dunno what this is */
+  color: #1053aa; /* main blue 1 */
   position: relative;
   z-index: 10;
   padding-top: 15px;}
@@ -135,26 +135,26 @@ ol li
 { font: normal 600% 'century gothic', arial;
   padding: 0 0 0 20px;
   margin: 0;
-  color: #444;} /* ???????? dunno what this is */
+  color: #1053aa;} /* main blue 1 */
 
 #footer p
 { letter-spacing: 0.1em;
   text-transform: uppercase;
   text-align: center;
   padding: 20px;
-  color: #444; /* ???????? dunno what this is */
+  color: #153f89; /* main blue 2 */
   font-size: 90%;}
 
 #footer a, #footer a:hover
-{ color: #1c162e; /* a more gray version of the main dark purple */
+{ color: #e2bd48; /* main yellow 2*/
   text-decoration: none;}
 
 #footer a:hover
-{ color: #f4a1c3;} /* main magenta color with super whiteness added */
+{ color: #f8df91;} /* main yellow 1 */
 
 .search
-{ color: #1f153a; /* darkest blue purple */ 
-  border: 1px solid #302254; /* lighter version of the blue purple above */ 
+{ color: #1f153a; /* darkest blue purple ??? where is this used*/ 
+  border: 1px solid #302254; /* lighter version of the blue purple above ???? where is this used*/ 
   width: 134px; 
   padding: 4px; 
   font: 100% arial, sans-serif;}
