@@ -1,71 +1,44 @@
 html
 { }
 
+/* ///////////// general css stuff ///////////// */
+
 *
 { margin: 0;
   padding: 0;}
 
 body
-{ font-family: "trebuchet ms", arial, sans-serif;
-  font-size: .84em;
-  color: #7e1a62; /* dark purple 3 */
-  line-height: 1.4em;
-  background: #73195a; /* dark purple 3.5 */
+{ background: #000000;
   width: 900px;
-  margin: 10px auto 0px auto;}
+  font-family: 'lucida sans', arial;
+  font-size: 1em;
+  color: #00ffff;
+  line-height: 1.4em;
   
-h1, h2, h3, h4, h5, h6 
-{ color: #7e1a62; /* dark purple 3 */
-  letter-spacing: 0em;
-  padding: 0 0 5px 0;}
+  margin: 10px auto 0px auto;}
 
 h1, h2, h3
 { font: normal 150% 'lucida sans', arial;
   margin: 0 0 15px 0;
   padding: 0 0 5px 0;
-  color: #9e196c;} /* dark purple 2 */
-
-h2
-{ font-size: 140%;
-  padding: 9px 0 5px 0;
-  color: #a4206c;} /* dark purple 1 */
-
-h3
-{ font-size: 140%;
-  padding: 5px 0 0 0;}
-
-h4, h6
-{ color: #a4206c; /* dark purple 1 */
-  padding: 0 0 5px 0;
-  font: normal 110% arial;
-  text-transform: uppercase;}
-
-h5, h6
-{ color: #a4206c; /* dark purple 1 */
-  font: normal 95% arial;
   letter-spacing: normal;
-  padding: 0 0 15px 0;}
+  color: #00ff00;}
+
+h4, h5, h6
+{ font: normal 100% 'lucida sans', arial;
+  margin: 0 0 15px 0;
+  padding: 0 0 5px 0;
+  letter-spacing: normal;
+  color: #ff8020;}
 
 a, a:hover
 { outline: none;
   text-decoration: underline;
-  color: #AEB002;} /* !!!!! not sure where this is??? */
-
-a:hover
-{ text-decoration: none;}
+  color: #ff8020;} /* links in text */
 
 p
 { line-height: 1.5em;
-  padding-bottom: 17px;}
-
-blockquote
-{ margin: 20px 0; 
-  padding: 10px 20px 0 20px;
-  border: 1px solid #E5E5DB; /* !!! light yellow for back of chart not changed */
-  background: #FFF;}
-
-ul
-{ margin: 2px 0 12px 0;}
+  padding-bottom: 12px;}
 
 ul li
 { list-style-type: none;
@@ -74,11 +47,10 @@ ul li
   padding: 0 0 4px 25px;
   line-height: 1.5em;}
 
-ol
-{ margin: 8px 0 22px 0;}
-
-ol li
-{ margin: 0 0 11px 20px;}
+ol 
+{ margin: 0 0 0 0; 
+  padding: 0 0 4px 25px;
+  line-height: 1.5em;}
 
 .left
 { float: left;
@@ -95,62 +67,77 @@ ol li
   text-align: center;
   margin: 20px auto;}
 
+#logo
+{ background: transparent;
+  position: relative;
+  z-index: 10;}
+
+#logo h1
+{ font: normal 600% 'century gothic', arial;
+  padding: 0 0 0 20px;
+  margin: 0 0 0 0;
+  letter-spacing: normal;
+  color: #ff00ff;}
+
+#footer p
+{ letter-spacing: 0.1em;
+  text-align: center;
+  padding: 20px;
+  color: #00ff00;
+  font-size: 80%;}
+
+#footer a, #footer a:hover
+{ color: #006300;
+  text-decoration: none;}
+
+#footer a:hover
+{ color: #ff8020;}
+
+table
+{ margin: 10px 0 30px 0;}
+
+table tr th, table tr td
+{ background: #ff00ff;
+  color: rgb(0, 0, 0);
+  padding: 6px 12px;
+  text-align: left;}
+  
+table tr td
+{ background: #00ffff;
+  color: #000000;
+  border-top: 1px solid #006564;}
+
+/* ///////////// accordian stuff ///////////// */
+
 #basic-accordian
 { padding: 0px;
-  background: #FFF;}
+  background: rgb(0, 0, 0);}
+
+.accordion_child
+{ padding: 25px;
+  background: #000000;}
 
 .accordion_headings
 { padding: 10px 25px 10px 25px;
-  background: #c80d5a; /* main pink 2 */
-  color: #e2bd48; /* main yellow 2*/
-  border-top: 1px solid #a70950; /* main pink 3 */
-  border-bottom: 1px solid #d61e64; /* main pink 1 */
+  background: #00ff00;
+  color: #000000;
+  border-top: 1px solid #00c300;
+  border-bottom: 1px solid #006300;
   cursor: pointer;
   font-size: 120%;
   position: relative;
   z-index: 20;}
 
 .accordion_headings:hover
-{ background: #33ac5d; /* main green 2 */
-  border-bottom: 1px solid #7aad60;} /* main green 2 */
-
-.accordion_child
-{ padding: 25px;
-  background: #f8df91;} /* main yellow 1 */
+{ background: #ff8020;
+  border-bottom: 1px solid #d96c22;}
 
 .header_highlight
-{ background: #33ac5d;
-  border-bottom: 1px solid #3cc26b;}
+{ background: #ff00ff;
+  border-bottom: 1px solid #680068;}
 
-#logo
-{ width: 100%;
-  height: 78px;
-  background: transparent;
-  color: #1053aa; /* main blue 1 */
-  position: relative;
-  z-index: 10;
-  padding-top: 15px;}
 
-#logo h1
-{ font: normal 600% 'century gothic', arial;
-  padding: 0 0 0 20px;
-  margin: 0;
-  color: #1053aa;} /* main blue 1 */
-
-#footer p
-{ letter-spacing: 0.1em;
-  text-transform: uppercase;
-  text-align: center;
-  padding: 20px;
-  color: #153f89; /* main blue 2 */
-  font-size: 90%;}
-
-#footer a, #footer a:hover
-{ color: #e2bd48; /* main yellow 2*/
-  text-decoration: none;}
-
-#footer a:hover
-{ color: #f8df91;} /* main yellow 1 */
+/* ///////////// not used stuff ///////////// */
 
 .search
 { color: #1f153a; /* darkest blue purple ??? where is this used*/ 
@@ -210,16 +197,4 @@ ol li
   border-bottom: 1px solid #FFF;
   margin: 0 0 20px 0;}
   
-table
-{ margin: 10px 0 30px 0;}
 
-table tr th, table tr td
-{ background: #3B3B3B;
-  color: #FFF;
-  padding: 7px 4px;
-  text-align: left;}
-  
-table tr td
-{ background: #E5E5DB;
-  color: #47433F;
-  border-top: 1px solid #FFF;}
