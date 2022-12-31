@@ -42,7 +42,7 @@ const initialize = () => {
   const isMetaMaskInstalled = () => {
     //Have to check the ethereum binding on the window object to see if it's installed
     const { ethereum } = window;
-    return Boolean(ethereum && ethereum.isMetaMask);
+    return Boolean(ethereum /* && ethereum.isMetaMask */);
   };
 
   //We create a new MetaMask onboarding object to use in our app
@@ -50,7 +50,7 @@ const initialize = () => {
 
   //This will start the onboarding proccess
   const onClickInstall = () => {
-    onboardButton.innerText = 'Onboarding in progress';
+    onboardButton.innerText = 'Please install/use a browser with web3';
     onboardButton.disabled = true;
     //On this object we have startOnboarding which will start the onboarding process for our end user
     onboarding.startOnboarding();
@@ -77,7 +77,7 @@ const initialize = () => {
       onboardButton.disabled = false;
     } else {
       //If MetaMask is installed we ask the user to connect to their wallet
-      onboardButton.innerText = 'Connect';
+      onboardButton.innerText = 'CONNECT-WALLET';
       //When the button is clicked we call this function to connect the users MetaMask Wallet
       onboardButton.onclick = onClickConnect;
       //The button is now disabled
