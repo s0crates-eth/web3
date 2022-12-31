@@ -1,3 +1,4 @@
+<!DOCTYPE html> 
 <html>
 
 <head>
@@ -6,48 +7,66 @@
   <link rel="icon" href="https://raw.githubusercontent.com/s0crates-eth/gm/main/images/bonfav.png">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.4.1/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.14.1/css/mdb.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css" type="text/css">
-
+  <link rel="stylesheet" href="styles.css" type="text/css">  
 </head>
 
-<body>
-  <main class="container-fluid">
-    <nav>
-      <ul style="font-size: 100%;">
-        <p><img src="https://raw.githubusercontent.com/s0crates-eth/gm/main/images//icontop.svg" alt="icontop"></p>
-        <li><a href="index.html">// HOME //</a></li>
-        <li><a href="#CONNECT">// CONNECT //</a></li>
-      </ul>
-    </nav>
+<body align-content-center style=
+  "background-image: url('https://raw.githubusercontent.com/s0crates-eth/gm/main/images/background.gif'); 
+  background-attachment: fixed; 
+  background-size: cover; 
+  margin: 50px; 
+  margin-top: 25px;" 
+>
 
-    <!-- <header>
-      <h1 class="text-center">
-        <img class="card-img-top" src="content/bon-banner-1500x500.jpg"
-        alt="BON Banner IMG">
-      </h1>
-    </header> -->
+<nav>
+  <ul style="font-size: 100%;">
+    <li><a href="https://bankofnowhere.eth.limo">// HOME //</a></li>
+  </ul>
+</nav>
 
-    <section id="#CONNECT">
-      <div class="row d-flex justify-content-center">
-        <div class="col-xl-4 col-lg-6 col-md-12 col-sm-12 col-12">
-          <div class="card">
-            <div class="card-body">
-              <h4 class="card-title">INITIALIZE-WEB3</h4>
-              <p class="info-text alert alert-secondary"><b>Network:</b><br><span id="network"></span></p>
-              <button class="btn btn-primary btn-lg btn-block mb-3" id="connectButton" disabled></button>
-              <button class="btn btn-primary btn-lg btn-block mb-3" id="getAccounts">CHECK-WALLET</button>
-              <p class="info-text alert alert-secondary">
-                <b>Wallet:</b><br><span id="getAccountsResult"></span>
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
+<div class="container">
+  <div style="font-size: 200%; color:#FF3A00; text-align: center;">
+    <b>// INITIALIZE-WEB3 //</b>
+  </div>
+  <br>
+  <div div style="font-size: 125%; color:whitesmoke; word-wrap: break-word;">
+    <p class="alert alert-secondary">
+      <b>Network:</b><br>
+      <span id="network" style="color:#FF3A00;"></span>
+    </p>
+    <button class="btn btn-primary btn-lg btn-block mb-3" id="connectButton" disabled></button>
+    <button class="btn btn-primary btn-lg btn-block mb-3" id="getAccounts">CHECK-WALLET</button>
+    <p class="alert alert-secondary">
+      <b>Wallet:</b><br>
+      <span id="getAccountsResult" style="color:#FF3A00;"></span>
+    </p>
+  </div>
+</div>
+
+<script src="node_modules/@metamask/onboarding/dist/metamask-onboarding.bundle.js" defer></script>
+<script src="contract.js" defer></script>
+
+</body>
+</html>
 
 
-     
-    <!-- this is all the html for the other buttons etc that are not currenly in the JS file
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- this is all the html for the other buttons etc that are not currenly in the JS file
+
 
     <section>
       <div class="row">
@@ -95,13 +114,6 @@
         </div>
       </div>
     </section>
+   
     
-    -->
-  
-  </main>
-
-  <script src="node_modules/@metamask/onboarding/dist/metamask-onboarding.bundle.js" defer></script>
-  <script src="contract.js" defer></script>
-</body>
-
-</html>
+-->

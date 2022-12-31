@@ -50,7 +50,7 @@ const initialize = () => {
 
   //This will start the onboarding proccess
   const onClickInstall = () => {
-    onboardButton.innerText = 'Please install/use a browser with web3';
+    onboardButton.innerText = 'Web3 installation in progress';
     onboardButton.disabled = true;
     //On this object we have startOnboarding which will start the onboarding process for our end user
     onboarding.startOnboarding();
@@ -70,7 +70,7 @@ const initialize = () => {
     //Now we check to see if Metmask is installed
     if (!isMetaMaskInstalled()) {
       //If it isn't installed we ask the user to click to install it
-      onboardButton.innerText = 'Click here to install MetaMask!';
+      onboardButton.innerText = 'No web3 found -- Click to install MetaMask';
       //When the button is clicked we call th is function
       onboardButton.onclick = onClickInstall;
       //The button is now disabled
@@ -90,7 +90,7 @@ const initialize = () => {
     //we use eth_accounts because it returns a list of addresses owned by us.
     const accounts = await ethereum.request({ method: 'eth_accounts' });
     //We take the first address in the array of addresses and display it
-    getAccountsResult.innerHTML = accounts[0] || 'Not able to get accounts';
+    getAccountsResult.innerHTML = accounts[0] || 'Unable to get accounts';
   });
 
   MetaMaskClientCheck();

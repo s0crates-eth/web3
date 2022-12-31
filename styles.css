@@ -77,7 +77,7 @@ iframe {
 
 
 .container {
-  background-image: url('images/black_opc50.png');
+  background-image: url('https://raw.githubusercontent.com/s0crates-eth/gm/main/images/black_opc50.png');
   width: (100% - 25px);
   padding: 25px;
   border-collapse: collapse;
@@ -88,7 +88,7 @@ iframe {
 hr {
 
   border-radius: 20px;
-  background-image: url('images/black_opc25.png');
+  background-image: url('https://raw.githubusercontent.com/s0crates-eth/gm/main/images/black_opc25.png');
 }
 
 ul {
@@ -106,6 +106,10 @@ ul {
       rgb(122, 235, 246) 0);
 }
 
+
+
+
+
 section {
   margin: 20px 0 20px 0;
 }
@@ -117,3 +121,4 @@ section {
 .full-width {
   width: 100%;
 }
+
