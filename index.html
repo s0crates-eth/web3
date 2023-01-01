@@ -24,17 +24,20 @@
   </ul>
 </nav>
 
+<br>
+
 <div class="container">
   <div style="font-size: 200%; color:#FF3A00; text-align: center;">
     <b>// INITIALIZE-WEB3 //</b>
   </div>
   <br>
   <div div style="font-size: 125%; color:whitesmoke; word-wrap: break-word;">
-    <p class="alert alert-secondary">
+    <!--NEED TO FIX THIS; DOESNT WORK-- <p class="alert alert-secondary">
       <b>Network:</b><br>
       <span id="network" style="color:#FF3A00;"></span>
-    </p>
+    </p> -->
     <button class="btn btn-primary btn-lg btn-block mb-3" id="connectButton" disabled></button>
+    <!--NEED TO CODE THIS IN-- <button class="btn btn-primary btn-lg btn-block mb-3" id="disconnectButton" disabled></button> -->
     <button class="btn btn-primary btn-lg btn-block mb-3" id="getAccounts">CHECK-WALLET</button>
     <p class="alert alert-secondary">
       <b>Wallet:</b><br>
@@ -43,77 +46,41 @@
   </div>
 </div>
 
+<br>
+
+<div class="container">
+  <div style="font-size: 200%; color:#FF3A00; text-align: center;">
+    <b>// CREATE-BON-ACCOUNT //</b>
+  </div>
+  <br>
+  <div div style="font-size: 125%; color:whitesmoke; word-wrap: break-word;">
+    <button class="btn btn-primary btn-lg btn-block mb-3" id="deployButton" disabled>Deploy Contract</button>
+    <button class="btn btn-primary btn-lg btn-block mb-3" id="depositButton" disabled>Deposit</button>
+    <button class="btn btn-primary btn-lg btn-block mb-3" id="withdrawButton" disabled>Withdraw</button>
+    <p class="alert alert-secondary">
+      <b>Account Status:</b><br>
+      <span id="contractStatus" style="color:#FF3A00;"></span>
+    </p>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
 <script src="node_modules/@metamask/onboarding/dist/metamask-onboarding.bundle.js" defer></script>
-<script src="contract.js" defer></script>
+<script src="index.js" defer></script>
 
 </body>
 </html>
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<!-- this is all the html for the other buttons etc that are not currenly in the JS file
-
-
-    <section>
-      <div class="row">
-        <div class="col-xl-4 col-lg-6 col-md-12 col-sm-12 col-12 d-flex align-items-stretch">
-          <div class="card full-width">
-            <div class="card-body">
-              <h4 class="card-title">Contract</h4>
-              <button class="btn btn-primary btn-lg btn-block mb-3" id="deployButton" disabled>Deploy Contract</button>
-              <button class="btn btn-primary btn-lg btn-block mb-3" id="depositButton" disabled>Deposit</button>
-              <button class="btn btn-primary btn-lg btn-block mb-3" id="withdrawButton" disabled>Withdraw</button>
-              <p class="info-text alert alert-secondary">Contract Status: <span id="contractStatus">Not clicked</span></p>
-            </div>
-          </div>
-        </div>
-
-        <div class="col-xl-4 col-lg-6 col-md-12 col-sm-12 col-12 d-flex align-items-stretch">
-          <div class="card full-width">
-            <div class="card-body">
-              <h4 class="card-title">Send Eth</h4>
-              <button class="btn btn-primary btn-lg btn-block mb-3" id="sendButton" disabled>Send</button>
-              <p class="info-text alert alert-info">Contract Status: <span id="contractStatus">Not clicked</span></p>
-              <hr />
-              <h4>Sign Typed Data</h4>
-              <button class="btn btn-primary btn-lg btn-block mb-3" id="signTypedData" disabled>Sign</button>
-              <p class="info-text alert alert-warning">Sign Typed Data Result: <span id="signTypedDataResult"></span></p>
-            </div>
-          </div>
-        </div>
-
-        <div class="col-xl-4 col-lg-6 col-md-12 col-sm-12 col-12 d-flex align-items-stretch">
-          <div class="card full-width">
-            <div class="card-body">
-              <h4 class="card-title">Send Tokens</h4>
-              <p class="info-text alert alert-success">Token: <span id="tokenAddress"></span></p>
-              <button class="btn btn-primary btn-lg btn-block mb-3" id="createToken" disabled>Create Token</button>
-              <button class="btn btn-primary btn-lg btn-block mb-3" id="transferTokens" disabled>Transfer Tokens</button>
-              <button class="btn btn-primary btn-lg btn-block mb-3" id="approveTokens" disabled>Approve Tokens</button>
-              <button class="btn btn-primary btn-lg btn-block mb-3" id="transferTokensWithoutGas" disabled>Transfer Tokens
-                Without Gas</button>
-              <button class="btn btn-primary btn-lg btn-block mb-3" id="approveTokensWithoutGas" disabled>Approve Tokens
-                Without Gas</button>
-              <p class="info-text alert alert-info">Contract Status: <span id="contractStatus">Not clicked</span></p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-   
-    
--->
