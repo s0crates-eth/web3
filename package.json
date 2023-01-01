@@ -24,7 +24,8 @@
   "files": [
     "/index.js",
     "/index.html",
-    "web3/"
+    "web3/",
+    "dist/"
   ],
 
   "author": "s0crates_eth",
