@@ -5,6 +5,7 @@
 >> NOTES
 - I have turned OFF the gitignore for the node_modules; this seems to have fixed the web3 connect issues, but im sure there is some way to 'import' these modules from where they originate -- to save space and improve performance
 - I have NOT 'yarn deployed' yet, but this seems to cause no apparent issues
+- need to intergrate the additional dapp functions -- starting with piggy bank
 
 
 
