@@ -15,13 +15,8 @@ module.exports = {
     },
   },
 
-  globals: {
-    'web3': 'readonly',
-    'ethereum': 'readonly',
-  },
-
   env: {
-    'browser': true,
+    browser: true,
   },
 
   plugins: [
@@ -33,15 +28,20 @@ module.exports = {
     '@metamask/eslint-config/config/nodejs',
   ],
 
-  overrides: [{
-    'files': ['src/index.js'],
-    'parserOptions': {
-      'sourceType': 'module',
-    },
-  }],
-
   globals: {
     'web3': true,
-    'ethereum': true,
   },
-}
+
+  extends: ['@metamask/eslint-config', '@metamask/eslint-config-nodejs'],
+
+  overrides: [
+    {
+      files: ['src/*.js'],
+      parserOptions: {
+        sourceType: 'module',
+      },
+    },
+  ],
+
+  ignorePatterns: ['!.eslintrc.js', 'dist'],
+};

@@ -16,7 +16,6 @@
   "files": [
     "/index.js",
     "/index.html",
-    "dist/",
     "web3/"
   ],
   "author": "s0crates",
