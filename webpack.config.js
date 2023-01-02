@@ -5,32 +5,50 @@ const CopyPlugin = require('copy-webpack-plugin')
 const DIST = path.resolve(__dirname, 'dist')
 
 module.exports = {
-  mode: 'development',
-  entry: './index.js',
-  output: {
-    filename: 'bundle.js',
-    path: DIST,
-    publicPath: DIST,
+  parserOptions: {
+    'sourceType': 'script',
+    'ecmaVersion': 2017,
+    'ecmaFeatures': {
+      'experimentalObjectRestSpread': true,
+      'impliedStrict': true,
+      'modules': true,
+      'blockBindings': true,
+      'arrowFunctions': true,
+      'objectLiteralShorthandMethods': true,
+      'objectLiteralShorthandProperties': true,
+      'templateStrings': true,
+      'classes': true,
+    },
   },
-  devServer: {
-    contentBase: DIST,
-    port: 9011,
-    writeToDisk: true,
-  },
-  plugins: [
-    new CleanWebpackPlugin({ cleanStaleWebpackAssets: false }),
 
-    // for build scripts
-    new CopyPlugin({
-      patterns: [
-        {
-          flatten: true,
-          from: './src/*',
-          globOptions: {
-            ignore: ['**/*.js'],
-          },
-        },
-      ],
-    }),
+  globals: {
+    'web3': 'readonly',
+    'ethereum': 'readonly',
+  },
+
+  env: {
+    'browser': true,
+  },
+
+  plugins: [
+    'json',
   ],
+
+  extends: [
+    '@metamask/eslint-config',
+    '@metamask/eslint-config/config/nodejs',
+  ],
+
+  overrides: [{
+    'files': ['src/index.js'],
+    'parserOptions': {
+      'sourceType': 'module',
+    },
+  }],
+
+  globals: {
+    'web3': true,
+    'ethereum': true,
+  },
 }
+
