@@ -1,809 +1,478 @@
+// ******************* OLD WORKING CODE  **********************
 
-import MetaMaskOnboarding from '@metamask/onboarding';
-import {
-  encrypt,
-  recoverPersonalSignature,
-  recoverTypedSignatureLegacy,
-  recoverTypedSignature,
-  recoverTypedSignature_v4 as recoverTypedSignatureV4,
-} from 'eth-sig-util';
-import { ethers } from 'ethers';
-import { toChecksumAddress } from 'ethereumjs-util';
-import {
-  hstBytecode,
-  hstAbi,
-  piggybankBytecode,
-  piggybankAbi,
-  collectiblesAbi,
-  collectiblesBytecode,
-  failingContractAbi,
-  failingContractBytecode,
-} from './constants.json';
+const forwarderOrigin = 'http://localhost:9010';
+const initialize = () => {
 
-let ethersProvider;
-let hstFactory;
-let piggybankFactory;
-let collectiblesFactory;
-let failingContractFactory;
-let hstContract;
-let piggybankContract;
-let collectiblesContract;
-let failingContract;
+  const onboardButton = document.getElementById('connectButton');
+  const getAccountsButton = document.getElementById('getAccounts');
+  const getAccountsResult = document.getElementById('getAccountsResult');
 
-const currentUrl = new URL(window.location.href);
-const forwarderOrigin =
-  currentUrl.hostname === 'localhost' ? 'http://localhost:9010' : undefined;
-const urlSearchParams = new URLSearchParams(window.location.search);
-const deployedContractAddress = urlSearchParams.get('contract');
+  const isMetaMaskInstalled = () => {
+    const { ethereum } = window;
+    return Boolean(ethereum);
+  };
 
-const { isMetaMaskInstalled } = MetaMaskOnboarding;
+  const onboarding = new MetaMaskOnboarding({ forwarderOrigin });
+
+  const onClickInstall = () => {
+    onboardButton.innerText = 'Web3 installation in progress';
+    onboardButton.disabled = true;
+    onboarding.startOnboarding();
+  };
+  const onClickConnect = async () => {
+    try {
+      // 0pen the MetaMask; should disable this button while
+      await ethereum.request({ method: 'eth_requestAccounts' });
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  const MetaMaskClientCheck = () => {
+    if (!isMetaMaskInstalled()) {
+      onboardButton.innerText = 'No web3 found -- Click to install MetaMask';
+      onboardButton.onclick = onClickInstall;
+      onboardButton.disabled = false;
+    } else {
+      onboardButton.innerText = 'CONNECT-WALLET';
+      onboardButton.onclick = onClickConnect;
+      onboardButton.disabled = false;
+    }
+  };
+
+  getAccountsButton.addEventListener('click', async () => {
+    //we use eth_accounts because it returns a list of addresses owned by us.
+    const accounts = await ethereum.request({ method: 'eth_accounts' });
+    //We take the first address in the array of addresses and display it
+    getAccountsResult.innerHTML = accounts[0] || 'Unable to get accounts';
+  });
+  MetaMaskClientCheck();
+};
+window.addEventListener('DOMContentLoaded', initialize);
+
+// ///////////////////////////////////////// */
+
+
+
+
+
+
+
+/* ///////////////// NEW CODE (not working yet) ///////////////
+
+import { encrypt } from 'eth-sig-util'
+import MetaMaskOnboarding from '@metamask/onboarding'
+
+const currentUrl = new URL(window.location.href)
+const forwarderOrigin = currentUrl.hostname === 'localhost'
+  ? 'http://localhost:9010'
+  : undefined
+
+const isMetaMaskInstalled = () => {
+  const { ethereum } = window
+  return Boolean(ethereum && ethereum.isMetaMask)
+}
 
 // Dapp Status Section
-const networkDiv = document.getElementById('network');
-const chainIdDiv = document.getElementById('chainId');
-const accountsDiv = document.getElementById('accounts');
-const warningDiv = document.getElementById('warning');
+const networkDiv = document.getElementById('network')
+const chainIdDiv = document.getElementById('chainId')
+const accountsDiv = document.getElementById('accounts')
 
 // Basic Actions Section
-const onboardButton = document.getElementById('connectButton');
-const getAccountsButton = document.getElementById('getAccounts');
-const getAccountsResults = document.getElementById('getAccountsResult');
+const onboardButton = document.getElementById('connectButton')
+const getAccountsButton = document.getElementById('getAccounts')
+const getAccountsResults = document.getElementById('getAccountsResult')
 
 // Permissions Actions Section
-const requestPermissionsButton = document.getElementById('requestPermissions');
-const getPermissionsButton = document.getElementById('getPermissions');
-const permissionsResult = document.getElementById('permissionsResult');
+const requestPermissionsButton = document.getElementById('requestPermissions')
+const getPermissionsButton = document.getElementById('getPermissions')
+const permissionsResult = document.getElementById('permissionsResult')
 
 // Contract Section
-const deployButton = document.getElementById('deployButton');
-const depositButton = document.getElementById('depositButton');
-const withdrawButton = document.getElementById('withdrawButton');
-const contractStatus = document.getElementById('contractStatus');
-const deployFailingButton = document.getElementById('deployFailingButton');
-const sendFailingButton = document.getElementById('sendFailingButton');
-const failingContractStatus = document.getElementById('failingContractStatus');
-
-// Collectibles Section
-const deployCollectiblesButton = document.getElementById(
-  'deployCollectiblesButton',
-);
-const mintButton = document.getElementById('mintButton');
-const mintAmountInput = document.getElementById('mintAmountInput');
-const approveTokenInput = document.getElementById('approveTokenInput');
-const approveButton = document.getElementById('approveButton');
-const setApprovalForAllButton = document.getElementById(
-  'setApprovalForAllButton',
-);
-const revokeButton = document.getElementById('revokeButton');
-const transferTokenInput = document.getElementById('transferTokenInput');
-const transferFromButton = document.getElementById('transferFromButton');
-const collectiblesStatus = document.getElementById('collectiblesStatus');
+const deployButton = document.getElementById('deployButton')
+const depositButton = document.getElementById('depositButton')
+const withdrawButton = document.getElementById('withdrawButton')
+const contractStatus = document.getElementById('contractStatus')
 
 // Send Eth Section
-const sendButton = document.getElementById('sendButton');
-const sendEIP1559Button = document.getElementById('sendEIP1559Button');
+const sendButton = document.getElementById('sendButton')
 
 // Send Tokens Section
-const decimalUnits = 4;
-const tokenSymbol = 'TST';
-const tokenAddress = document.getElementById('tokenAddress');
-const createToken = document.getElementById('createToken');
-const watchAsset = document.getElementById('watchAsset');
-const transferTokens = document.getElementById('transferTokens');
-const approveTokens = document.getElementById('approveTokens');
-const transferTokensWithoutGas = document.getElementById(
-  'transferTokensWithoutGas',
-);
-const approveTokensWithoutGas = document.getElementById(
-  'approveTokensWithoutGas',
-);
+const tokenAddress = document.getElementById('tokenAddress')
+const createToken = document.getElementById('createToken')
+const transferTokens = document.getElementById('transferTokens')
+const approveTokens = document.getElementById('approveTokens')
+const transferTokensWithoutGas = document.getElementById('transferTokensWithoutGas')
+const approveTokensWithoutGas = document.getElementById('approveTokensWithoutGas')
+
+// Signed Type Data Section
+const signTypedData = document.getElementById('signTypedData')
+const signTypedDataResults = document.getElementById('signTypedDataResult')
 
 // Encrypt / Decrypt Section
-const getEncryptionKeyButton = document.getElementById(
-  'getEncryptionKeyButton',
-);
-const encryptMessageInput = document.getElementById('encryptMessageInput');
-const encryptButton = document.getElementById('encryptButton');
-const decryptButton = document.getElementById('decryptButton');
-const encryptionKeyDisplay = document.getElementById('encryptionKeyDisplay');
-const ciphertextDisplay = document.getElementById('ciphertextDisplay');
-const cleartextDisplay = document.getElementById('cleartextDisplay');
-
-// Ethereum Signature Section
-const ethSign = document.getElementById('ethSign');
-const ethSignResult = document.getElementById('ethSignResult');
-const personalSign = document.getElementById('personalSign');
-const personalSignResult = document.getElementById('personalSignResult');
-const personalSignVerify = document.getElementById('personalSignVerify');
-const personalSignVerifySigUtilResult = document.getElementById(
-  'personalSignVerifySigUtilResult',
-);
-const personalSignVerifyECRecoverResult = document.getElementById(
-  'personalSignVerifyECRecoverResult',
-);
-const signTypedData = document.getElementById('signTypedData');
-const signTypedDataResult = document.getElementById('signTypedDataResult');
-const signTypedDataVerify = document.getElementById('signTypedDataVerify');
-const signTypedDataVerifyResult = document.getElementById(
-  'signTypedDataVerifyResult',
-);
-const signTypedDataV3 = document.getElementById('signTypedDataV3');
-const signTypedDataV3Result = document.getElementById('signTypedDataV3Result');
-const signTypedDataV3Verify = document.getElementById('signTypedDataV3Verify');
-const signTypedDataV3VerifyResult = document.getElementById(
-  'signTypedDataV3VerifyResult',
-);
-const signTypedDataV4 = document.getElementById('signTypedDataV4');
-const signTypedDataV4Result = document.getElementById('signTypedDataV4Result');
-const signTypedDataV4Verify = document.getElementById('signTypedDataV4Verify');
-const signTypedDataV4VerifyResult = document.getElementById(
-  'signTypedDataV4VerifyResult',
-);
-const siwe = document.getElementById('siwe');
-const siweResources = document.getElementById('siweResources');
-const siweBadDomain = document.getElementById('siweBadDomain');
-const siweBadAccount = document.getElementById('siweBadAccount');
-const siweMalformed = document.getElementById('siweMalformed');
-const siweResult = document.getElementById('siweResult');
-
-// Send form section
-const fromDiv = document.getElementById('fromInput');
-const toDiv = document.getElementById('toInput');
-const type = document.getElementById('typeInput');
-const amount = document.getElementById('amountInput');
-const gasPrice = document.getElementById('gasInput');
-const maxFee = document.getElementById('maxFeeInput');
-const maxPriority = document.getElementById('maxPriorityFeeInput');
-const data = document.getElementById('dataInput');
-const gasPriceDiv = document.getElementById('gasPriceDiv');
-const maxFeeDiv = document.getElementById('maxFeeDiv');
-const maxPriorityDiv = document.getElementById('maxPriorityDiv');
-const submitFormButton = document.getElementById('submitForm');
-
-// Miscellaneous
-const addEthereumChain = document.getElementById('addEthereumChain');
-const switchEthereumChain = document.getElementById('switchEthereumChain');
+const getEncryptionKeyButton = document.getElementById('getEncryptionKeyButton')
+const encryptMessageInput = document.getElementById('encryptMessageInput')
+const encryptButton = document.getElementById('encryptButton')
+const decryptButton = document.getElementById('decryptButton')
+const encryptionKeyDisplay = document.getElementById('encryptionKeyDisplay')
+const ciphertextDisplay = document.getElementById('ciphertextDisplay')
+const cleartextDisplay = document.getElementById('cleartextDisplay')
 
 const initialize = async () => {
+
+  let onboarding
   try {
-    // We must specify the network as 'any' for ethers to allow network changes
-    ethersProvider = new ethers.providers.Web3Provider(window.ethereum, 'any');
-    if (deployedContractAddress) {
-      hstContract = new ethers.Contract(
-        deployedContractAddress,
-        hstAbi,
-        ethersProvider.getSigner(),
-      );
-      piggybankContract = new ethers.Contract(
-        deployedContractAddress,
-        piggybankAbi,
-        ethersProvider.getSigner(),
-      );
-      collectiblesContract = new ethers.Contract(
-        deployedContractAddress,
-        collectiblesAbi,
-        ethersProvider.getSigner(),
-      );
-      failingContract = new ethers.Contract(
-        deployedContractAddress,
-        failingContractAbi,
-        ethersProvider.getSigner(),
-      );
-    }
-    hstFactory = new ethers.ContractFactory(
-      hstAbi,
-      hstBytecode,
-      ethersProvider.getSigner(),
-    );
-    piggybankFactory = new ethers.ContractFactory(
-      piggybankAbi,
-      piggybankBytecode,
-      ethersProvider.getSigner(),
-    );
-    collectiblesFactory = new ethers.ContractFactory(
-      collectiblesAbi,
-      collectiblesBytecode,
-      ethersProvider.getSigner(),
-    );
-    failingContractFactory = new ethers.ContractFactory(
-      failingContractAbi,
-      failingContractBytecode,
-      ethersProvider.getSigner(),
-    );
+    onboarding = new MetaMaskOnboarding({ forwarderOrigin })
   } catch (error) {
-    console.error(error);
+    console.error(error)
   }
 
-  let onboarding;
-  try {
-    onboarding = new MetaMaskOnboarding({ forwarderOrigin });
-  } catch (error) {
-    console.error(error);
-  }
-
-  let accounts;
-  let accountButtonsInitialized = false;
+  let accounts
+  let piggybankContract
+  let accountButtonsInitialized = false
 
   const accountButtons = [
     deployButton,
     depositButton,
     withdrawButton,
-    deployCollectiblesButton,
-    mintButton,
-    mintAmountInput,
-    approveTokenInput,
-    approveButton,
-    setApprovalForAllButton,
-    revokeButton,
-    transferTokenInput,
-    transferFromButton,
-    deployFailingButton,
-    sendFailingButton,
     sendButton,
     createToken,
-    watchAsset,
     transferTokens,
     approveTokens,
     transferTokensWithoutGas,
     approveTokensWithoutGas,
+    signTypedData,
     getEncryptionKeyButton,
     encryptMessageInput,
     encryptButton,
     decryptButton,
-    ethSign,
-    personalSign,
-    personalSignVerify,
-    signTypedData,
-    signTypedDataVerify,
-    signTypedDataV3,
-    signTypedDataV3Verify,
-    signTypedDataV4,
-    signTypedDataV4Verify,
-    siwe,
-    siweResources,
-    siweBadDomain,
-    siweBadAccount,
-    siweMalformed,
-  ];
+  ]
 
-  const isMetaMaskConnected = () => accounts && accounts.length > 0;
+  const isMetaMaskConnected = () => accounts && accounts.length > 0
 
   const onClickInstall = () => {
-    onboardButton.innerText = 'Onboarding in progress';
-    onboardButton.disabled = true;
-    onboarding.startOnboarding();
-  };
+    onboardButton.innerText = 'Onboarding in progress'
+    onboardButton.disabled = true
+    onboarding.startOnboarding()
+  }
 
   const onClickConnect = async () => {
     try {
       const newAccounts = await ethereum.request({
         method: 'eth_requestAccounts',
-      });
-      handleNewAccounts(newAccounts);
+      })
+      handleNewAccounts(newAccounts)
     } catch (error) {
-      console.error(error);
+      console.error(error)
     }
-  };
+  }
 
   const clearTextDisplays = () => {
-    encryptionKeyDisplay.innerText = '';
-    encryptMessageInput.value = '';
-    ciphertextDisplay.innerText = '';
-    cleartextDisplay.innerText = '';
-  };
+    encryptionKeyDisplay.innerText = ''
+    encryptMessageInput.value = ''
+    ciphertextDisplay.innerText = ''
+    cleartextDisplay.innerText = ''
+  }
 
   const updateButtons = () => {
-    const accountButtonsDisabled =
-      !isMetaMaskInstalled() || !isMetaMaskConnected();
+    const accountButtonsDisabled = !isMetaMaskInstalled() || !isMetaMaskConnected()
     if (accountButtonsDisabled) {
       for (const button of accountButtons) {
-        button.disabled = true;
+        button.disabled = true
       }
-      clearTextDisplays();
+      clearTextDisplays()
     } else {
-      deployButton.disabled = false;
-      deployCollectiblesButton.disabled = false;
-      sendButton.disabled = false;
-      deployFailingButton.disabled = false;
-      createToken.disabled = false;
-      personalSign.disabled = false;
-      signTypedData.disabled = false;
-      getEncryptionKeyButton.disabled = false;
-      ethSign.disabled = false;
-      personalSign.disabled = false;
-      signTypedData.disabled = false;
-      signTypedDataV3.disabled = false;
-      signTypedDataV4.disabled = false;
-      siwe.disabled = false;
-      siweResources.disabled = false;
-      siweBadDomain.disabled = false;
-      siweBadAccount.disabled = false;
-      siweMalformed.disabled = false;
+      deployButton.disabled = false
+      sendButton.disabled = false
+      createToken.disabled = false
+      signTypedData.disabled = false
+      getEncryptionKeyButton.disabled = false
     }
 
-    if (isMetaMaskInstalled()) {
-      addEthereumChain.disabled = false;
-      switchEthereumChain.disabled = false;
-    } else {
-      onboardButton.innerText = 'Click here to install MetaMask!';
-      onboardButton.onclick = onClickInstall;
-      onboardButton.disabled = false;
-    }
-
-    if (isMetaMaskConnected()) {
-      onboardButton.innerText = 'Connected';
-      onboardButton.disabled = true;
+    if (!isMetaMaskInstalled()) {
+      onboardButton.innerText = 'Click here to install MetaMask!'
+      onboardButton.onclick = onClickInstall
+      onboardButton.disabled = false
+    } else if (isMetaMaskConnected()) {
+      onboardButton.innerText = 'Connected'
+      onboardButton.disabled = true
       if (onboarding) {
-        onboarding.stopOnboarding();
+        onboarding.stopOnboarding()
       }
     } else {
-      onboardButton.innerText = 'Connect';
-      onboardButton.onclick = onClickConnect;
-      onboardButton.disabled = false;
+      onboardButton.innerText = 'Connect'
+      onboardButton.onclick = onClickConnect
+      onboardButton.disabled = false
     }
-
-    if (deployedContractAddress) {
-      // Piggy bank contract
-      contractStatus.innerHTML = 'Deployed';
-      depositButton.disabled = false;
-      withdrawButton.disabled = false;
-      // Failing contract
-      failingContractStatus.innerHTML = 'Deployed';
-      sendFailingButton.disabled = false;
-      // ERC721 Token - Collectibles contract
-      collectiblesStatus.innerHTML = 'Deployed';
-      mintButton.disabled = false;
-      mintAmountInput.disabled = false;
-      approveTokenInput.disabled = false;
-      approveButton.disabled = false;
-      setApprovalForAllButton.disabled = false;
-      revokeButton.disabled = false;
-      transferTokenInput.disabled = false;
-      transferFromButton.disabled = false;
-      // ERC20 Token - Send Tokens
-      tokenAddress.innerHTML = hstContract.address;
-      watchAsset.disabled = false;
-      transferTokens.disabled = false;
-      approveTokens.disabled = false;
-      transferTokensWithoutGas.disabled = false;
-      approveTokensWithoutGas.disabled = false;
-    }
-  };
-
-  addEthereumChain.onclick = async () => {
-    await ethereum.request({
-      method: 'wallet_addEthereumChain',
-      params: [
-        {
-          chainId: '0x53a',
-          rpcUrls: ['http://127.0.0.1:8546'],
-          chainName: 'Localhost 8546',
-          nativeCurrency: { name: 'TEST', decimals: 18, symbol: 'TEST' },
-          blockExplorerUrls: null,
-        },
-      ],
-    });
-  };
-
-  switchEthereumChain.onclick = async () => {
-    await ethereum.request({
-      method: 'wallet_switchEthereumChain',
-      params: [
-        {
-          chainId: '0x53a',
-        },
-      ],
-    });
-  };
+  }
 
   const initializeAccountButtons = () => {
+
     if (accountButtonsInitialized) {
-      return;
+      return
     }
-    accountButtonsInitialized = true;
+    accountButtonsInitialized = true
 
-    /**
-     * Piggy bank
-     */
+    // Contract Interactions
 
+    piggybankContract = web3.eth.contract([{ 'constant': false, 'inputs': [{ 'name': 'withdrawAmount', 'type': 'uint256' }], 'name': 'withdraw', 'outputs': [{ 'name': 'remainingBal', 'type': 'uint256' }], 'payable': false, 'stateMutability': 'nonpayable', 'type': 'function' }, { 'constant': true, 'inputs': [], 'name': 'owner', 'outputs': [{ 'name': '', 'type': 'address' }], 'payable': false, 'stateMutability': 'view', 'type': 'function' }, { 'constant': false, 'inputs': [], 'name': 'deposit', 'outputs': [{ 'name': '', 'type': 'uint256' }], 'payable': true, 'stateMutability': 'payable', 'type': 'function' }, { 'inputs': [], 'payable': false, 'stateMutability': 'nonpayable', 'type': 'constructor' }])
     deployButton.onclick = async () => {
-      contractStatus.innerHTML = 'Deploying';
+      contractStatus.innerHTML = 'Deploying'
 
-      try {
-        piggybankContract = await piggybankFactory.deploy();
-        await piggybankContract.deployTransaction.wait();
-      } catch (error) {
-        contractStatus.innerHTML = 'Deployment Failed';
-        throw error;
-      }
+      const piggybank = await piggybankContract.new(
+        {
+          from: accounts[0],
+          data: '0x608060405234801561001057600080fd5b5033600160006101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff1602179055506000808190555061023b806100686000396000f300608060405260043610610057576000357c0100000000000000000000000000000000000000000000000000000000900463ffffffff1680632e1a7d4d1461005c5780638da5cb5b1461009d578063d0e30db0146100f4575b600080fd5b34801561006857600080fd5b5061008760048036038101908080359060200190929190505050610112565b6040518082815260200191505060405180910390f35b3480156100a957600080fd5b506100b26101d0565b604051808273ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200191505060405180910390f35b6100fc6101f6565b6040518082815260200191505060405180910390f35b6000600160009054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff163373ffffffffffffffffffffffffffffffffffffffff1614151561017057600080fd5b8160008082825403925050819055503373ffffffffffffffffffffffffffffffffffffffff166108fc839081150290604051600060405180830381858888f193505050501580156101c5573d6000803e3d6000fd5b506000549050919050565b600160009054906101000a900473ffffffffffffffffffffffffffffffffffffffff1681565b60003460008082825401925050819055506000549050905600a165627a7a72305820f237db3ec816a52589d82512117bc85bc08d3537683ffeff9059108caf3e5d400029',
+          gas: '4700000',
+        }, (error, contract) => {
+          if (error) {
+            contractStatus.innerHTML = 'Deployment Failed'
+            throw error
+          } else if (contract.address === undefined) {
+            return
+          }
 
-      if (piggybankContract.address === undefined) {
-        return;
-      }
+          console.log(`Contract mined! address: ${contract.address} transactionHash: ${contract.transactionHash}`)
+          contractStatus.innerHTML = 'Deployed'
+          depositButton.disabled = false
+          withdrawButton.disabled = false
 
-      console.log(
-        `Contract mined! address: ${piggybankContract.address} transactionHash: ${piggybankContract.deployTransaction.hash}`,
-      );
-      contractStatus.innerHTML = 'Deployed';
-      depositButton.disabled = false;
-      withdrawButton.disabled = false;
-    };
+          depositButton.onclick = () => {
+            contractStatus.innerHTML = 'Deposit initiated'
+            contract.deposit(
+              {
+                from: accounts[0],
+                value: '0x3782dace9d900000',
+              },
+              (result) => {
+                console.log(result)
+                contractStatus.innerHTML = 'Deposit completed'
+              },
+            )
+          }
+          withdrawButton.onclick = () => {
+            contract.withdraw(
+              '0xde0b6b3a7640000',
+              { from: accounts[0] },
+              (result) => {
+                console.log(result)
+                contractStatus.innerHTML = 'Withdrawn'
+              },
+            )
+          }
+        },
+      )
+      console.log(piggybank)
+    }
 
-    depositButton.onclick = async () => {
-      contractStatus.innerHTML = 'Deposit initiated';
-      const result = await piggybankContract.deposit({
+    // Sending ETH
+
+    sendButton.onclick = () => {
+      web3.eth.sendTransaction({
         from: accounts[0],
-        value: '0x3782dace9d900000',
-      });
-      console.log(result);
-      const receipt = await result.wait();
-      console.log(receipt);
-      contractStatus.innerHTML = 'Deposit completed';
-    };
+        to: '0x2f318C334780961FB129D2a6c30D0763d9a5C970',
+        value: '0x29a2241af62c0000',
+        gas: 21000,
+        gasPrice: 20000000000,
+      }, (result) => {
+        console.log(result)
+      })
+    }
 
-    withdrawButton.onclick = async () => {
-      const result = await piggybankContract.withdraw('0xde0b6b3a7640000', {
-        from: accounts[0],
-      });
-      console.log(result);
-      const receipt = await result.wait();
-      console.log(receipt);
-      contractStatus.innerHTML = 'Withdrawn';
-    };
+    // ERC20 Token
 
-    /**
-     * Failing
-     */
+    createToken.onclick = () => {
+      const _initialAmount = 100
+      const _tokenName = 'TST'
+      const _decimalUnits = 0
+      const _tokenSymbol = 'TST'
+      const humanstandardtokenContract = web3.eth.contract([{ 'constant': true, 'inputs': [], 'name': 'name', 'outputs': [{ 'name': '', 'type': 'string' }], 'payable': false, 'stateMutability': 'view', 'type': 'function' }, { 'constant': false, 'inputs': [{ 'name': '_spender', 'type': 'address' }, { 'name': '_value', 'type': 'uint256' }], 'name': 'approve', 'outputs': [{ 'name': 'success', 'type': 'bool' }], 'payable': false, 'stateMutability': 'nonpayable', 'type': 'function' }, { 'constant': true, 'inputs': [], 'name': 'totalSupply', 'outputs': [{ 'name': '', 'type': 'uint256' }], 'payable': false, 'stateMutability': 'view', 'type': 'function' }, { 'constant': false, 'inputs': [{ 'name': '_from', 'type': 'address' }, { 'name': '_to', 'type': 'address' }, { 'name': '_value', 'type': 'uint256' }], 'name': 'transferFrom', 'outputs': [{ 'name': 'success', 'type': 'bool' }], 'payable': false, 'stateMutability': 'nonpayable', 'type': 'function' }, { 'constant': true, 'inputs': [], 'name': 'decimals', 'outputs': [{ 'name': '', 'type': 'uint8' }], 'payable': false, 'stateMutability': 'view', 'type': 'function' }, { 'constant': true, 'inputs': [], 'name': 'version', 'outputs': [{ 'name': '', 'type': 'string' }], 'payable': false, 'stateMutability': 'view', 'type': 'function' }, { 'constant': true, 'inputs': [{ 'name': '_owner', 'type': 'address' }], 'name': 'balanceOf', 'outputs': [{ 'name': 'balance', 'type': 'uint256' }], 'payable': false, 'stateMutability': 'view', 'type': 'function' }, { 'constant': true, 'inputs': [], 'name': 'symbol', 'outputs': [{ 'name': '', 'type': 'string' }], 'payable': false, 'stateMutability': 'view', 'type': 'function' }, { 'constant': false, 'inputs': [{ 'name': '_to', 'type': 'address' }, { 'name': '_value', 'type': 'uint256' }], 'name': 'transfer', 'outputs': [{ 'name': 'success', 'type': 'bool' }], 'payable': false, 'stateMutability': 'nonpayable', 'type': 'function' }, { 'constant': false, 'inputs': [{ 'name': '_spender', 'type': 'address' }, { 'name': '_value', 'type': 'uint256' }, { 'name': '_extraData', 'type': 'bytes' }], 'name': 'approveAndCall', 'outputs': [{ 'name': 'success', 'type': 'bool' }], 'payable': false, 'stateMutability': 'nonpayable', 'type': 'function' }, { 'constant': true, 'inputs': [{ 'name': '_owner', 'type': 'address' }, { 'name': '_spender', 'type': 'address' }], 'name': 'allowance', 'outputs': [{ 'name': 'remaining', 'type': 'uint256' }], 'payable': false, 'stateMutability': 'view', 'type': 'function' }, { 'inputs': [{ 'name': '_initialAmount', 'type': 'uint256' }, { 'name': '_tokenName', 'type': 'string' }, { 'name': '_decimalUnits', 'type': 'uint8' }, { 'name': '_tokenSymbol', 'type': 'string' }], 'payable': false, 'stateMutability': 'nonpayable', 'type': 'constructor' }, { 'payable': false, 'stateMutability': 'nonpayable', 'type': 'fallback' }, { 'anonymous': false, 'inputs': [{ 'indexed': true, 'name': '_from', 'type': 'address' }, { 'indexed': true, 'name': '_to', 'type': 'address' }, { 'indexed': false, 'name': '_value', 'type': 'uint256' }], 'name': 'Transfer', 'type': 'event' }, { 'anonymous': false, 'inputs': [{ 'indexed': true, 'name': '_owner', 'type': 'address' }, { 'indexed': true, 'name': '_spender', 'type': 'address' }, { 'indexed': false, 'name': '_value', 'type': 'uint256' }], 'name': 'Approval', 'type': 'event' }])
 
-    deployFailingButton.onclick = async () => {
-      failingContractStatus.innerHTML = 'Deploying';
+      return humanstandardtokenContract.new(
+        _initialAmount,
+        _tokenName,
+        _decimalUnits,
+        _tokenSymbol,
+        {
+          from: accounts[0],
+          data: '0x60806040523480156200001157600080fd5b506040516200156638038062001566833981018060405260808110156200003757600080fd5b8101908080516401000000008111156200005057600080fd5b828101905060208101848111156200006757600080fd5b81518560018202830111640100000000821117156200008557600080fd5b50509291906020018051640100000000811115620000a257600080fd5b82810190506020810184811115620000b957600080fd5b8151856001820283011164010000000082111715620000d757600080fd5b5050929190602001805190602001909291908051906020019092919050505083838382600390805190602001906200011192919062000305565b5081600490805190602001906200012a92919062000305565b5080600560006101000a81548160ff021916908360ff1602179055505050506200016433826200016e640100000000026401000000009004565b50505050620003b4565b600073ffffffffffffffffffffffffffffffffffffffff168273ffffffffffffffffffffffffffffffffffffffff1614151515620001ab57600080fd5b620001d081600254620002e36401000000000262001155179091906401000000009004565b60028190555062000237816000808573ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200190815260200160002054620002e36401000000000262001155179091906401000000009004565b6000808473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff168152602001908152602001600020819055508173ffffffffffffffffffffffffffffffffffffffff16600073ffffffffffffffffffffffffffffffffffffffff167fddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef836040518082815260200191505060405180910390a35050565b6000808284019050838110151515620002fb57600080fd5b8091505092915050565b828054600181600116156101000203166002900490600052602060002090601f016020900481019282601f106200034857805160ff191683800117855562000379565b8280016001018555821562000379579182015b82811115620003785782518255916020019190600101906200035b565b5b5090506200038891906200038c565b5090565b620003b191905b80821115620003ad57600081600090555060010162000393565b5090565b90565b6111a280620003c46000396000f3fe6080604052600436106100af576000357c0100000000000000000000000000000000000000000000000000000000900463ffffffff16806306fdde03146100b4578063095ea7b31461014457806318160ddd146101b757806323b872dd146101e2578063313ce5671461027557806339509351146102a657806370a082311461031957806395d89b411461037e578063a457c2d71461040e578063a9059cbb14610481578063dd62ed3e146104f4575b600080fd5b3480156100c057600080fd5b506100c9610579565b6040518080602001828103825283818151815260200191508051906020019080838360005b838110156101095780820151818401526020810190506100ee565b50505050905090810190601f1680156101365780820380516001836020036101000a031916815260200191505b509250505060405180910390f35b34801561015057600080fd5b5061019d6004803603604081101561016757600080fd5b81019080803573ffffffffffffffffffffffffffffffffffffffff1690602001909291908035906020019092919050505061061b565b604051808215151515815260200191505060405180910390f35b3480156101c357600080fd5b506101cc610748565b6040518082815260200191505060405180910390f35b3480156101ee57600080fd5b5061025b6004803603606081101561020557600080fd5b81019080803573ffffffffffffffffffffffffffffffffffffffff169060200190929190803573ffffffffffffffffffffffffffffffffffffffff16906020019092919080359060200190929190505050610752565b604051808215151515815260200191505060405180910390f35b34801561028157600080fd5b5061028a61095a565b604051808260ff1660ff16815260200191505060405180910390f35b3480156102b257600080fd5b506102ff600480360360408110156102c957600080fd5b81019080803573ffffffffffffffffffffffffffffffffffffffff16906020019092919080359060200190929190505050610971565b604051808215151515815260200191505060405180910390f35b34801561032557600080fd5b506103686004803603602081101561033c57600080fd5b81019080803573ffffffffffffffffffffffffffffffffffffffff169060200190929190505050610ba8565b6040518082815260200191505060405180910390f35b34801561038a57600080fd5b50610393610bf0565b6040518080602001828103825283818151815260200191508051906020019080838360005b838110156103d35780820151818401526020810190506103b8565b50505050905090810190601f1680156104005780820380516001836020036101000a031916815260200191505b509250505060405180910390f35b34801561041a57600080fd5b506104676004803603604081101561043157600080fd5b81019080803573ffffffffffffffffffffffffffffffffffffffff16906020019092919080359060200190929190505050610c92565b604051808215151515815260200191505060405180910390f35b34801561048d57600080fd5b506104da600480360360408110156104a457600080fd5b81019080803573ffffffffffffffffffffffffffffffffffffffff16906020019092919080359060200190929190505050610ec9565b604051808215151515815260200191505060405180910390f35b34801561050057600080fd5b506105636004803603604081101561051757600080fd5b81019080803573ffffffffffffffffffffffffffffffffffffffff169060200190929190803573ffffffffffffffffffffffffffffffffffffffff169060200190929190505050610ee0565b6040518082815260200191505060405180910390f35b606060038054600181600116156101000203166002900480601f0160208091040260200160405190810160405280929190818152602001828054600181600116156101000203166002900480156106115780601f106105e657610100808354040283529160200191610611565b820191906000526020600020905b8154815290600101906020018083116105f457829003601f168201915b5050505050905090565b60008073ffffffffffffffffffffffffffffffffffffffff168373ffffffffffffffffffffffffffffffffffffffff161415151561065857600080fd5b81600160003373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200190815260200160002060008573ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff168152602001908152602001600020819055508273ffffffffffffffffffffffffffffffffffffffff163373ffffffffffffffffffffffffffffffffffffffff167f8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925846040518082815260200191505060405180910390a36001905092915050565b6000600254905090565b60006107e382600160008773ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200190815260200160002060003373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200190815260200160002054610f6790919063ffffffff16565b600160008673ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200190815260200160002060003373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff1681526020019081526020016000208190555061086e848484610f89565b3373ffffffffffffffffffffffffffffffffffffffff168473ffffffffffffffffffffffffffffffffffffffff167f8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925600160008873ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200190815260200160002060003373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff168152602001908152602001600020546040518082815260200191505060405180910390a3600190509392505050565b6000600560009054906101000a900460ff16905090565b60008073ffffffffffffffffffffffffffffffffffffffff168373ffffffffffffffffffffffffffffffffffffffff16141515156109ae57600080fd5b610a3d82600160003373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200190815260200160002060008673ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff1681526020019081526020016000205461115590919063ffffffff16565b600160003373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200190815260200160002060008573ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff168152602001908152602001600020819055508273ffffffffffffffffffffffffffffffffffffffff163373ffffffffffffffffffffffffffffffffffffffff167f8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925600160003373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200190815260200160002060008773ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff168152602001908152602001600020546040518082815260200191505060405180910390a36001905092915050565b60008060008373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff168152602001908152602001600020549050919050565b606060048054600181600116156101000203166002900480601f016020809104026020016040519081016040528092919081815260200182805460018160011615610100020316600290048015610c885780601f10610c5d57610100808354040283529160200191610c88565b820191906000526020600020905b815481529060010190602001808311610c6b57829003601f168201915b5050505050905090565b60008073ffffffffffffffffffffffffffffffffffffffff168373ffffffffffffffffffffffffffffffffffffffff1614151515610ccf57600080fd5b610d5e82600160003373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200190815260200160002060008673ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200190815260200160002054610f6790919063ffffffff16565b600160003373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200190815260200160002060008573ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff168152602001908152602001600020819055508273ffffffffffffffffffffffffffffffffffffffff163373ffffffffffffffffffffffffffffffffffffffff167f8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925600160003373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200190815260200160002060008773ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff168152602001908152602001600020546040518082815260200191505060405180910390a36001905092915050565b6000610ed6338484610f89565b6001905092915050565b6000600160008473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200190815260200160002060008373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200190815260200160002054905092915050565b6000828211151515610f7857600080fd5b600082840390508091505092915050565b600073ffffffffffffffffffffffffffffffffffffffff168273ffffffffffffffffffffffffffffffffffffffff1614151515610fc557600080fd5b611016816000808673ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200190815260200160002054610f6790919063ffffffff16565b6000808573ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff168152602001908152602001600020819055506110a9816000808573ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff1681526020019081526020016000205461115590919063ffffffff16565b6000808473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff168152602001908152602001600020819055508173ffffffffffffffffffffffffffffffffffffffff168373ffffffffffffffffffffffffffffffffffffffff167fddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef836040518082815260200191505060405180910390a3505050565b600080828401905083811015151561116c57600080fd5b809150509291505056fea165627a7a723058205fcdfea06f4d97b442bc9f444b1e92524bc66398eb4f37ed5a99f2093a8842640029000000000000000000000000000000000000000000000000000000000000008000000000000000000000000000000000000000000000000000000000000000c0000000000000000000000000000000000000000000000000000000000000000400000000000000000000000000000000000000000000000000000000000186a00000000000000000000000000000000000000000000000000000000000000003545354000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000035453540000000000000000000000000000000000000000000000000000000000',
+          gas: '4700000',
+          gasPrice: '20000000000',
+        }, (error, contract) => {
+          if (error) {
+            tokenAddress.innerHTML = 'Creation Failed'
+            throw error
+          } else if (contract.address === undefined) {
+            return
+          }
 
-      try {
-        failingContract = await failingContractFactory.deploy();
-        await failingContract.deployTransaction.wait();
-      } catch (error) {
-        failingContractStatus.innerHTML = 'Deployment Failed';
-        throw error;
+          console.log(`Contract mined! address: ${contract.address} transactionHash: ${contract.transactionHash}`)
+          tokenAddress.innerHTML = contract.address
+          transferTokens.disabled = false
+          approveTokens.disabled = false
+          transferTokensWithoutGas.disabled = false
+          approveTokensWithoutGas.disabled = false
+
+          transferTokens.onclick = (event) => {
+            console.log(`event`, event)
+            contract.transfer('0x2f318C334780961FB129D2a6c30D0763d9a5C970', '15000', {
+              from: accounts[0],
+              to: contract.address,
+              data: '0xa9059cbb0000000000000000000000002f318c334780961fb129d2a6c30d0763d9a5c9700000000000000000000000000000000000000000000000000000000000003a98',
+              gas: 60000,
+              gasPrice: '20000000000',
+            }, (result) => {
+              console.log('result', result)
+            })
+          }
+
+          approveTokens.onclick = () => {
+            contract.approve('0x9bc5baF874d2DA8D216aE9f137804184EE5AfEF4', '70000', {
+              from: accounts[0],
+              to: contract.address,
+              data: '0x095ea7b30000000000000000000000009bc5baF874d2DA8D216aE9f137804184EE5AfEF40000000000000000000000000000000000000000000000000000000000000005',
+              gas: 60000,
+              gasPrice: '20000000000',
+            }, (result) => {
+              console.log(result)
+            })
+          }
+
+          transferTokensWithoutGas.onclick = (event) => {
+            console.log(`event`, event)
+            contract.transfer('0x2f318C334780961FB129D2a6c30D0763d9a5C970', '15000', {
+              from: accounts[0],
+              to: contract.address,
+              data: '0xa9059cbb0000000000000000000000002f318c334780961fb129d2a6c30d0763d9a5c9700000000000000000000000000000000000000000000000000000000000003a98',
+              gasPrice: '20000000000',
+            }, (result) => {
+              console.log('result', result)
+            })
+          }
+
+          approveTokensWithoutGas.onclick = () => {
+            contract.approve('0x2f318C334780961FB129D2a6c30D0763d9a5C970', '70000', {
+              from: accounts[0],
+              to: contract.address,
+              data: '0x095ea7b30000000000000000000000002f318C334780961FB129D2a6c30D0763d9a5C9700000000000000000000000000000000000000000000000000000000000000005',
+              gasPrice: '20000000000',
+            }, (result) => {
+              console.log(result)
+            })
+          }
+        },
+      )
+    }
+
+    // Sign Typed Data
+
+    signTypedData.onclick = async () => {
+      const networkId = parseInt(networkDiv.innerHTML, 10)
+      const chainId = parseInt(chainIdDiv.innerHTML, 10) || networkId
+
+      const typedData = {
+        types: {
+          EIP712Domain: [
+            { name: 'name', type: 'string' },
+            { name: 'version', type: 'string' },
+            { name: 'chainId', type: 'uint256' },
+            { name: 'verifyingContract', type: 'address' },
+          ],
+          Person: [
+            { name: 'name', type: 'string' },
+            { name: 'wallet', type: 'address' },
+          ],
+          Mail: [
+            { name: 'from', type: 'Person' },
+            { name: 'to', type: 'Person' },
+            { name: 'contents', type: 'string' },
+          ],
+        },
+        primaryType: 'Mail',
+        domain: {
+          name: 'Ether Mail',
+          version: '1',
+          chainId,
+          verifyingContract: '0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC',
+        },
+        message: {
+          sender: {
+            name: 'Cow',
+            wallet: '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826',
+          },
+          recipient: {
+            name: 'Bob',
+            wallet: '0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB',
+          },
+          contents: 'Hello, Bob!',
+        },
       }
 
-      if (failingContract.address === undefined) {
-        return;
-      }
-
-      console.log(
-        `Contract mined! address: ${failingContract.address} transactionHash: ${failingContract.deployTransaction.hash}`,
-      );
-      failingContractStatus.innerHTML = 'Deployed';
-      sendFailingButton.disabled = false;
-    };
-
-    sendFailingButton.onclick = async () => {
       try {
         const result = await ethereum.request({
-          method: 'eth_sendTransaction',
-          params: [
-            {
-              from: accounts[0],
-              to: failingContract.address,
-              value: '0x0',
-              gasLimit: '0x5028',
-              maxFeePerGas: '0x2540be400',
-              maxPriorityFeePerGas: '0x3b9aca00',
-            },
-          ],
-        });
-        failingContractStatus.innerHTML =
-          'Failed transaction process completed as expected.';
-        console.log('send failing contract result', result);
-      } catch (error) {
-        console.log('error', error);
-        throw error;
+          method: 'eth_signTypedData_v3',
+          params: [accounts[0], JSON.stringify(typedData)],
+        })
+        signTypedDataResults.innerHTML = JSON.stringify(result)
+      } catch (err) {
+        console.error(err)
       }
-    };
+    }
 
-    /**
-     * ERC721 Token
-     */
-
-    deployCollectiblesButton.onclick = async () => {
-      collectiblesStatus.innerHTML = 'Deploying';
-
-      try {
-        collectiblesContract = await collectiblesFactory.deploy();
-        await collectiblesContract.deployTransaction.wait();
-      } catch (error) {
-        collectiblesStatus.innerHTML = 'Deployment Failed';
-        throw error;
-      }
-
-      if (collectiblesContract.address === undefined) {
-        return;
-      }
-
-      console.log(
-        `Contract mined! address: ${collectiblesContract.address} transactionHash: ${collectiblesContract.deployTransaction.hash}`,
-      );
-      collectiblesStatus.innerHTML = 'Deployed';
-      mintButton.disabled = false;
-      mintAmountInput.disabled = false;
-    };
-
-    mintButton.onclick = async () => {
-      collectiblesStatus.innerHTML = 'Mint initiated';
-      let result = await collectiblesContract.mintCollectibles(
-        mintAmountInput.value,
-        {
-          from: accounts[0],
-        },
-      );
-      result = await result.wait();
-      console.log(result);
-      collectiblesStatus.innerHTML = 'Mint completed';
-      approveTokenInput.disabled = false;
-      approveButton.disabled = false;
-      setApprovalForAllButton.disabled = false;
-      revokeButton.disabled = false;
-      transferTokenInput.disabled = false;
-      transferFromButton.disabled = false;
-    };
-
-    approveButton.onclick = async () => {
-      collectiblesStatus.innerHTML = 'Approve initiated';
-      let result = await collectiblesContract.approve(
-        '0x9bc5baF874d2DA8D216aE9f137804184EE5AfEF4',
-        approveTokenInput.value,
-        {
-          from: accounts[0],
-        },
-      );
-      result = await result.wait();
-      console.log(result);
-      collectiblesStatus.innerHTML = 'Approve completed';
-    };
-
-    setApprovalForAllButton.onclick = async () => {
-      collectiblesStatus.innerHTML = 'Set Approval For All initiated';
-      let result = await collectiblesContract.setApprovalForAll(
-        '0x9bc5baF874d2DA8D216aE9f137804184EE5AfEF4',
-        true,
-        {
-          from: accounts[0],
-        },
-      );
-      result = await result.wait();
-      console.log(result);
-      collectiblesStatus.innerHTML = 'Set Approval For All completed';
-    };
-
-    revokeButton.onclick = async () => {
-      collectiblesStatus.innerHTML = 'Revoke initiated';
-      let result = await collectiblesContract.setApprovalForAll(
-        '0x9bc5baF874d2DA8D216aE9f137804184EE5AfEF4',
-        false,
-        {
-          from: accounts[0],
-        },
-      );
-      result = await result.wait();
-      console.log(result);
-      collectiblesStatus.innerHTML = 'Revoke completed';
-    };
-
-    transferFromButton.onclick = async () => {
-      collectiblesStatus.innerHTML = 'Transfer From initiated';
-      let result = await collectiblesContract.transferFrom(
-        accounts[0],
-        '0x2f318C334780961FB129D2a6c30D0763d9a5C970',
-        transferTokenInput.value,
-        {
-          from: accounts[0],
-        },
-      );
-      result = await result.wait();
-      console.log(result);
-      collectiblesStatus.innerHTML = 'Transfer From completed';
-    };
-
-    /**
-     * Sending ETH
-     */
-
-    sendButton.onclick = async () => {
-      const result = await ethereum.request({
-        method: 'eth_sendTransaction',
-        params: [
-          {
-            from: accounts[0],
-            to: '0x0c54FcCd2e384b4BB6f2E405Bf5Cbc15a017AaFb',
-            value: '0x0',
-            gasLimit: '0x5028',
-            gasPrice: '0x2540be400',
-            type: '0x0',
-          },
-        ],
-      });
-      console.log(result);
-    };
-
-    sendEIP1559Button.onclick = async () => {
-      const result = await ethereum.request({
-        method: 'eth_sendTransaction',
-        params: [
-          {
-            from: accounts[0],
-            to: '0x0c54FcCd2e384b4BB6f2E405Bf5Cbc15a017AaFb',
-            value: '0x0',
-            gasLimit: '0x5028',
-            maxFeePerGas: '0x2540be400',
-            maxPriorityFeePerGas: '0x3b9aca00',
-          },
-        ],
-      });
-      console.log(result);
-    };
-
-    /**
-     * ERC20 Token
-     */
-
-    createToken.onclick = async () => {
-      const _initialAmount = 100;
-      const _tokenName = 'TST';
-
-      try {
-        hstContract = await hstFactory.deploy(
-          _initialAmount,
-          _tokenName,
-          decimalUnits,
-          tokenSymbol,
-        );
-        await hstContract.deployTransaction.wait();
-      } catch (error) {
-        tokenAddress.innerHTML = 'Creation Failed';
-        throw error;
-      }
-
-      if (hstContract.address === undefined) {
-        return;
-      }
-
-      console.log(
-        `Contract mined! address: ${hstContract.address} transactionHash: ${hstContract.deployTransaction.hash}`,
-      );
-      tokenAddress.innerHTML = hstContract.address;
-      watchAsset.disabled = false;
-      transferTokens.disabled = false;
-      approveTokens.disabled = false;
-      transferTokensWithoutGas.disabled = false;
-      approveTokensWithoutGas.disabled = false;
-    };
-
-    watchAsset.onclick = async () => {
-      const result = await ethereum.request({
-        method: 'wallet_watchAsset',
-        params: {
-          type: 'ERC20',
-          options: {
-            address: hstContract.address,
-            symbol: tokenSymbol,
-            decimals: decimalUnits,
-            image: 'https://metamask.github.io/test-dapp/metamask-fox.svg',
-          },
-        },
-      });
-      console.log('result', result);
-    };
-
-    transferTokens.onclick = async () => {
-      const result = await hstContract.transfer(
-        '0x2f318C334780961FB129D2a6c30D0763d9a5C970',
-        '15000',
-        {
-          from: accounts[0],
-          gasLimit: 60000,
-          gasPrice: '20000000000',
-        },
-      );
-      console.log('result', result);
-    };
-
-    approveTokens.onclick = async () => {
-      const result = await hstContract.approve(
-        '0x9bc5baF874d2DA8D216aE9f137804184EE5AfEF4',
-        '70000',
-        {
-          from: accounts[0],
-          gasLimit: 60000,
-          gasPrice: '20000000000',
-        },
-      );
-      console.log('result', result);
-    };
-
-    transferTokensWithoutGas.onclick = async () => {
-      const result = await hstContract.transfer(
-        '0x2f318C334780961FB129D2a6c30D0763d9a5C970',
-        '15000',
-        {
-          gasPrice: '20000000000',
-        },
-      );
-      console.log('result', result);
-    };
-
-    approveTokensWithoutGas.onclick = async () => {
-      const result = await hstContract.approve(
-        '0x2f318C334780961FB129D2a6c30D0763d9a5C970',
-        '70000',
-        {
-          gasPrice: '20000000000',
-        },
-      );
-      console.log('result', result);
-    };
-
-    /**
-     * Permissions
-     */
+    // Permissions
 
     requestPermissionsButton.onclick = async () => {
       try {
         const permissionsArray = await ethereum.request({
           method: 'wallet_requestPermissions',
           params: [{ eth_accounts: {} }],
-        });
-        permissionsResult.innerHTML =
-          getPermissionsDisplayString(permissionsArray);
+        })
+        permissionsResult.innerHTML = getPermissionsDisplayString(permissionsArray)
       } catch (err) {
-        console.error(err);
-        permissionsResult.innerHTML = `Error: ${err.message}`;
+        console.error(err)
+        permissionsResult.innerHTML = `Error: ${err.message}`
       }
-    };
+    }
 
     getPermissionsButton.onclick = async () => {
       try {
         const permissionsArray = await ethereum.request({
           method: 'wallet_getPermissions',
-        });
-        permissionsResult.innerHTML =
-          getPermissionsDisplayString(permissionsArray);
+        })
+        permissionsResult.innerHTML = getPermissionsDisplayString(permissionsArray)
       } catch (err) {
-        console.error(err);
-        permissionsResult.innerHTML = `Error: ${err.message}`;
+        console.error(err)
+        permissionsResult.innerHTML = `Error: ${err.message}`
       }
-    };
+    }
 
     getAccountsButton.onclick = async () => {
       try {
         const _accounts = await ethereum.request({
           method: 'eth_accounts',
-        });
-        getAccountsResults.innerHTML =
-          _accounts[0] || 'Not able to get accounts';
+        })
+        getAccountsResults.innerHTML = _accounts[0] || 'Not able to get accounts'
       } catch (err) {
-        console.error(err);
-        getAccountsResults.innerHTML = `Error: ${err.message}`;
+        console.error(err)
+        getAccountsResults.innerHTML = `Error: ${err.message}`
       }
-    };
+    }
 
-    /**
-     * Encrypt / Decrypt
-     */
+    // Encrypt / Decrypt
 
     getEncryptionKeyButton.onclick = async () => {
       try {
         encryptionKeyDisplay.innerText = await ethereum.request({
           method: 'eth_getEncryptionPublicKey',
           params: [accounts[0]],
-        });
-        encryptMessageInput.disabled = false;
+        })
+        encryptMessageInput.disabled = false
       } catch (error) {
-        encryptionKeyDisplay.innerText = `Error: ${error.message}`;
-        encryptMessageInput.disabled = true;
-        encryptButton.disabled = true;
-        decryptButton.disabled = true;
+        encryptionKeyDisplay.innerText = `Error: ${error.message}`
+        encryptMessageInput.disabled = true
+        encryptButton.disabled = true
+        decryptButton.disabled = true
       }
-    };
+    }
 
     encryptMessageInput.onkeyup = () => {
       if (
@@ -811,774 +480,104 @@ const initialize = async () => {
         encryptMessageInput.value.length > 0
       ) {
         if (encryptButton.disabled) {
-          encryptButton.disabled = false;
+          encryptButton.disabled = false
         }
       } else if (!encryptButton.disabled) {
-        encryptButton.disabled = true;
+        encryptButton.disabled = true
       }
-    };
+    }
 
     encryptButton.onclick = () => {
       try {
-        ciphertextDisplay.innerText = stringifiableToHex(
+        ciphertextDisplay.innerText = web3.toHex(JSON.stringify(
           encrypt(
             encryptionKeyDisplay.innerText,
-            { data: encryptMessageInput.value },
+            { 'data': encryptMessageInput.value },
             'x25519-xsalsa20-poly1305',
           ),
-        );
-        decryptButton.disabled = false;
+        ))
+        decryptButton.disabled = false
       } catch (error) {
-        ciphertextDisplay.innerText = `Error: ${error.message}`;
-        decryptButton.disabled = true;
+        ciphertextDisplay.innerText = `Error: ${error.message}`
+        decryptButton.disabled = true
       }
-    };
+    }
 
     decryptButton.onclick = async () => {
       try {
         cleartextDisplay.innerText = await ethereum.request({
           method: 'eth_decrypt',
           params: [ciphertextDisplay.innerText, ethereum.selectedAddress],
-        });
+        })
       } catch (error) {
-        cleartextDisplay.innerText = `Error: ${error.message}`;
+        cleartextDisplay.innerText = `Error: ${error.message}`
       }
-    };
-  };
-
-  type.onchange = async () => {
-    if (type.value === '0x0') {
-      gasPriceDiv.style.display = 'block';
-      maxFeeDiv.style.display = 'none';
-      maxPriorityDiv.style.display = 'none';
-    } else {
-      gasPriceDiv.style.display = 'none';
-      maxFeeDiv.style.display = 'block';
-      maxPriorityDiv.style.display = 'block';
     }
-  };
+  }
 
-  submitFormButton.onclick = async () => {
-    let params;
-    if (type.value === '0x0') {
-      params = [
-        {
-          from: accounts[0],
-          to: toDiv.value,
-          value: amount.value,
-          gasPrice: gasPrice.value,
-          type: type.value,
-          data: data.value,
-        },
-      ];
-    } else {
-      params = [
-        {
-          from: accounts[0],
-          to: toDiv.value,
-          value: amount.value,
-          maxFeePerGas: maxFee.value,
-          maxPriorityFeePerGas: maxPriority.value,
-          type: type.value,
-          data: data.value,
-        },
-      ];
-    }
-    const result = await ethereum.request({
-      method: 'eth_sendTransaction',
-      params,
-    });
-    console.log(result);
-  };
-
-  /**
-   * eth_sign
-   */
-  ethSign.onclick = async () => {
-    try {
-      // const msg = 'Sample message to hash for signature'
-      // const msgHash = keccak256(msg)
-      const msg =
-        '0x879a053d4800c6354e76c7985a865d2922c82fb5b3f4577b2fe08b998954f2e0';
-      const ethResult = await ethereum.request({
-        method: 'eth_sign',
-        params: [accounts[0], msg],
-      });
-      ethSignResult.innerHTML = JSON.stringify(ethResult);
-    } catch (err) {
-      console.error(err);
-      ethSign.innerHTML = `Error: ${err.message}`;
-    }
-  };
-
-  /**
-   * Personal Sign
-   */
-  personalSign.onclick = async () => {
-    const exampleMessage = 'Example `personal_sign` message';
-    try {
-      const from = accounts[0];
-      const msg = `0x${Buffer.from(exampleMessage, 'utf8').toString('hex')}`;
-      const sign = await ethereum.request({
-        method: 'personal_sign',
-        params: [msg, from, 'Example password'],
-      });
-      personalSignResult.innerHTML = sign;
-      personalSignVerify.disabled = false;
-    } catch (err) {
-      console.error(err);
-      personalSign.innerHTML = `Error: ${err.message}`;
-    }
-  };
-
-  /**
-   * Sign In With Ethereum helper
-   */
-
-  const siweSign = async (siweMessage) => {
-    try {
-      const from = accounts[0];
-      const msg = `0x${Buffer.from(siweMessage, 'utf8').toString('hex')}`;
-      const sign = await ethereum.request({
-        method: 'personal_sign',
-        params: [msg, from, 'Example password'],
-      });
-      siweResult.innerHTML = sign;
-    } catch (err) {
-      console.error(err);
-      siweResult.innerHTML = `Error: ${err.message}`;
-    }
-  };
-
-  /**
-   * Sign In With Ethereum
-   */
-  siwe.onclick = async () => {
-    const domain = window.location.host;
-    const from = accounts[0];
-    const siweMessage = `${domain} wants you to sign in with your Ethereum account:\n${from}\n\nI accept the MetaMask Terms of Service: https://community.metamask.io/tos\n\nURI: https://${domain}\nVersion: 1\nChain ID: 1\nNonce: 32891757\nIssued At: 2021-09-30T16:25:24.000Z`;
-    siweSign(siweMessage);
-  };
-
-  /**
-   * Sign In With Ethereum (with Resources)
-   */
-  siweResources.onclick = async () => {
-    const domain = window.location.host;
-    const from = accounts[0];
-    const siweMessageResources = `${domain} wants you to sign in with your Ethereum account:\n${from}\n\nI accept the MetaMask Terms of Service: https://community.metamask.io/tos\n\nURI: https://${domain}\nVersion: 1\nChain ID: 1\nNonce: 32891757\nIssued At: 2021-09-30T16:25:24.000Z\nNot Before: 2022-03-17T12:45:13.610Z\nRequest ID: some_id\nResources:\n- ipfs://Qme7ss3ARVgxv6rXqVPiikMJ8u2NLgmgszg13pYrDKEoiu\n- https://example.com/my-web2-claim.json`;
-    siweSign(siweMessageResources);
-  };
-
-  /**
-   * Sign In With Ethereum (Bad Domain)
-   */
-  siweBadDomain.onclick = async () => {
-    const domain = 'metamask.badactor.io';
-    const from = accounts[0];
-    const siweMessageBadDomain = `${domain} wants you to sign in with your Ethereum account:\n${from}\n\nI accept the MetaMask Terms of Service: https://community.metamask.io/tos\n\nURI: https://${domain}\nVersion: 1\nChain ID: 1\nNonce: 32891757\nIssued At: 2021-09-30T16:25:24.000Z\nResources:\n- ipfs://Qme7ss3ARVgxv6rXqVPiikMJ8u2NLgmgszg13pYrDKEoiu\n- https://example.com/my-web2-claim.json`;
-    siweSign(siweMessageBadDomain);
-  };
-
-  /**
-   * Sign In With Ethereum (Bad Account)
-   */
-  siweBadAccount.onclick = async () => {
-    const domain = window.location.host;
-    const from = '0x0000000000000000000000000000000000000000';
-    const siweMessageBadDomain = `${domain} wants you to sign in with your Ethereum account:\n${from}\n\nI accept the MetaMask Terms of Service: https://community.metamask.io/tos\n\nURI: https://${domain}\nVersion: 1\nChain ID: 1\nNonce: 32891757\nIssued At: 2021-09-30T16:25:24.000Z\nResources:\n- ipfs://Qme7ss3ARVgxv6rXqVPiikMJ8u2NLgmgszg13pYrDKEoiu\n- https://example.com/my-web2-claim.json`;
-    siweSign(siweMessageBadDomain);
-  };
-
-  /**
-   * Sign In With Ethereum (Malformed)
-   */
-  siweMalformed.onclick = async () => {
-    const domain = window.location.host;
-    const from = accounts[0];
-    const siweMessageMissing = `${domain} wants you to sign in with your Ethereum account:\n${from}\n\nI accept the MetaMask Terms of Service: https://community.metamask.io/tos\n\nVersion: 1\nNonce: 32891757\nIssued At: 2021-09-30T16:25:24Z`;
-    siweSign(siweMessageMissing);
-  };
-
-  /**
-   * Personal Sign Verify
-   */
-  personalSignVerify.onclick = async () => {
-    const exampleMessage = 'Example `personal_sign` message';
-    try {
-      const from = accounts[0];
-      const msg = `0x${Buffer.from(exampleMessage, 'utf8').toString('hex')}`;
-      const sign = personalSignResult.innerHTML;
-      const recoveredAddr = recoverPersonalSignature({
-        data: msg,
-        sig: sign,
-      });
-      if (recoveredAddr === from) {
-        console.log(`SigUtil Successfully verified signer as ${recoveredAddr}`);
-        personalSignVerifySigUtilResult.innerHTML = recoveredAddr;
-      } else {
-        console.log(
-          `SigUtil Failed to verify signer when comparing ${recoveredAddr} to ${from}`,
-        );
-        console.log(`Failed comparing ${recoveredAddr} to ${from}`);
-      }
-      const ecRecoverAddr = await ethereum.request({
-        method: 'personal_ecRecover',
-        params: [msg, sign],
-      });
-      if (ecRecoverAddr === from) {
-        console.log(`Successfully ecRecovered signer as ${ecRecoverAddr}`);
-        personalSignVerifyECRecoverResult.innerHTML = ecRecoverAddr;
-      } else {
-        console.log(
-          `Failed to verify signer when comparing ${ecRecoverAddr} to ${from}`,
-        );
-      }
-    } catch (err) {
-      console.error(err);
-      personalSignVerifySigUtilResult.innerHTML = `Error: ${err.message}`;
-      personalSignVerifyECRecoverResult.innerHTML = `Error: ${err.message}`;
-    }
-  };
-
-  /**
-   * Sign Typed Data Test
-   */
-  signTypedData.onclick = async () => {
-    const msgParams = [
-      {
-        type: 'string',
-        name: 'Message',
-        value: 'Hi, Alice!',
-      },
-      {
-        type: 'uint32',
-        name: 'A number',
-        value: '1337',
-      },
-    ];
-    try {
-      const from = accounts[0];
-      const sign = await ethereum.request({
-        method: 'eth_signTypedData',
-        params: [msgParams, from],
-      });
-      signTypedDataResult.innerHTML = sign;
-      signTypedDataVerify.disabled = false;
-    } catch (err) {
-      console.error(err);
-      signTypedDataResult.innerHTML = `Error: ${err.message}`;
-    }
-  };
-
-  /**
-   * Sign Typed Data Verification
-   */
-  signTypedDataVerify.onclick = async () => {
-    const msgParams = [
-      {
-        type: 'string',
-        name: 'Message',
-        value: 'Hi, Alice!',
-      },
-      {
-        type: 'uint32',
-        name: 'A number',
-        value: '1337',
-      },
-    ];
-    try {
-      const from = accounts[0];
-      const sign = signTypedDataResult.innerHTML;
-      const recoveredAddr = await recoverTypedSignatureLegacy({
-        data: msgParams,
-        sig: sign,
-      });
-      if (toChecksumAddress(recoveredAddr) === toChecksumAddress(from)) {
-        console.log(`Successfully verified signer as ${recoveredAddr}`);
-        signTypedDataVerifyResult.innerHTML = recoveredAddr;
-      } else {
-        console.log(
-          `Failed to verify signer when comparing ${recoveredAddr} to ${from}`,
-        );
-      }
-    } catch (err) {
-      console.error(err);
-      signTypedDataV3VerifyResult.innerHTML = `Error: ${err.message}`;
-    }
-  };
-
-  /**
-   * Sign Typed Data Version 3 Test
-   */
-  signTypedDataV3.onclick = async () => {
-    const networkId = parseInt(networkDiv.innerHTML, 10);
-    const chainId = parseInt(chainIdDiv.innerHTML, 16) || networkId;
-
-    const msgParams = {
-      types: {
-        EIP712Domain: [
-          { name: 'name', type: 'string' },
-          { name: 'version', type: 'string' },
-          { name: 'chainId', type: 'uint256' },
-          { name: 'verifyingContract', type: 'address' },
-        ],
-        Person: [
-          { name: 'name', type: 'string' },
-          { name: 'wallet', type: 'address' },
-        ],
-        Mail: [
-          { name: 'from', type: 'Person' },
-          { name: 'to', type: 'Person' },
-          { name: 'contents', type: 'string' },
-        ],
-      },
-      primaryType: 'Mail',
-      domain: {
-        name: 'Ether Mail',
-        version: '1',
-        chainId,
-        verifyingContract: '0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC',
-      },
-      message: {
-        from: {
-          name: 'Cow',
-          wallet: '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826',
-        },
-        to: {
-          name: 'Bob',
-          wallet: '0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB',
-        },
-        contents: 'Hello, Bob!',
-      },
-    };
-    try {
-      const from = accounts[0];
-      const sign = await ethereum.request({
-        method: 'eth_signTypedData_v3',
-        params: [from, JSON.stringify(msgParams)],
-      });
-      signTypedDataV3Result.innerHTML = sign;
-      signTypedDataV3Verify.disabled = false;
-    } catch (err) {
-      console.error(err);
-      signTypedDataV3Result.innerHTML = `Error: ${err.message}`;
-    }
-  };
-
-  /**
-   * Sign Typed Data V3 Verification
-   */
-  signTypedDataV3Verify.onclick = async () => {
-    const networkId = parseInt(networkDiv.innerHTML, 10);
-    const chainId = parseInt(chainIdDiv.innerHTML, 16) || networkId;
-
-    const msgParams = {
-      types: {
-        EIP712Domain: [
-          { name: 'name', type: 'string' },
-          { name: 'version', type: 'string' },
-          { name: 'chainId', type: 'uint256' },
-          { name: 'verifyingContract', type: 'address' },
-        ],
-        Person: [
-          { name: 'name', type: 'string' },
-          { name: 'wallet', type: 'address' },
-        ],
-        Mail: [
-          { name: 'from', type: 'Person' },
-          { name: 'to', type: 'Person' },
-          { name: 'contents', type: 'string' },
-        ],
-      },
-      primaryType: 'Mail',
-      domain: {
-        name: 'Ether Mail',
-        version: '1',
-        chainId,
-        verifyingContract: '0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC',
-      },
-      message: {
-        from: {
-          name: 'Cow',
-          wallet: '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826',
-        },
-        to: {
-          name: 'Bob',
-          wallet: '0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB',
-        },
-        contents: 'Hello, Bob!',
-      },
-    };
-    try {
-      const from = accounts[0];
-      const sign = signTypedDataV3Result.innerHTML;
-      const recoveredAddr = await recoverTypedSignature({
-        data: msgParams,
-        sig: sign,
-      });
-      if (toChecksumAddress(recoveredAddr) === toChecksumAddress(from)) {
-        console.log(`Successfully verified signer as ${recoveredAddr}`);
-        signTypedDataV3VerifyResult.innerHTML = recoveredAddr;
-      } else {
-        console.log(
-          `Failed to verify signer when comparing ${recoveredAddr} to ${from}`,
-        );
-      }
-    } catch (err) {
-      console.error(err);
-      signTypedDataV3VerifyResult.innerHTML = `Error: ${err.message}`;
-    }
-  };
-
-  /**
-   * Sign Typed Data V4
-   */
-  signTypedDataV4.onclick = async () => {
-    const networkId = parseInt(networkDiv.innerHTML, 10);
-    const chainId = parseInt(chainIdDiv.innerHTML, 16) || networkId;
-    const msgParams = {
-      domain: {
-        chainId: chainId.toString(),
-        name: 'Ether Mail',
-        verifyingContract: '0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC',
-        version: '1',
-      },
-      message: {
-        contents: 'Hello, Bob!',
-        from: {
-          name: 'Cow',
-          wallets: [
-            '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826',
-            '0xDeaDbeefdEAdbeefdEadbEEFdeadbeEFdEaDbeeF',
-          ],
-        },
-        to: [
-          {
-            name: 'Bob',
-            wallets: [
-              '0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB',
-              '0xB0BdaBea57B0BDABeA57b0bdABEA57b0BDabEa57',
-              '0xB0B0b0b0b0b0B000000000000000000000000000',
-            ],
-          },
-        ],
-      },
-      primaryType: 'Mail',
-      types: {
-        EIP712Domain: [
-          { name: 'name', type: 'string' },
-          { name: 'version', type: 'string' },
-          { name: 'chainId', type: 'uint256' },
-          { name: 'verifyingContract', type: 'address' },
-        ],
-        Group: [
-          { name: 'name', type: 'string' },
-          { name: 'members', type: 'Person[]' },
-        ],
-        Mail: [
-          { name: 'from', type: 'Person' },
-          { name: 'to', type: 'Person[]' },
-          { name: 'contents', type: 'string' },
-        ],
-        Person: [
-          { name: 'name', type: 'string' },
-          { name: 'wallets', type: 'address[]' },
-        ],
-      },
-    };
-    try {
-      const from = accounts[0];
-      const sign = await ethereum.request({
-        method: 'eth_signTypedData_v4',
-        params: [from, JSON.stringify(msgParams)],
-      });
-      signTypedDataV4Result.innerHTML = sign;
-      signTypedDataV4Verify.disabled = false;
-    } catch (err) {
-      console.error(err);
-      signTypedDataV4Result.innerHTML = `Error: ${err.message}`;
-    }
-  };
-
-  /**
-   *  Sign Typed Data V4 Verification
-   */
-  signTypedDataV4Verify.onclick = async () => {
-    const networkId = parseInt(networkDiv.innerHTML, 10);
-    const chainId = parseInt(chainIdDiv.innerHTML, 16) || networkId;
-    const msgParams = {
-      domain: {
-        chainId,
-        name: 'Ether Mail',
-        verifyingContract: '0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC',
-        version: '1',
-      },
-      message: {
-        contents: 'Hello, Bob!',
-        from: {
-          name: 'Cow',
-          wallets: [
-            '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826',
-            '0xDeaDbeefdEAdbeefdEadbEEFdeadbeEFdEaDbeeF',
-          ],
-        },
-        to: [
-          {
-            name: 'Bob',
-            wallets: [
-              '0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB',
-              '0xB0BdaBea57B0BDABeA57b0bdABEA57b0BDabEa57',
-              '0xB0B0b0b0b0b0B000000000000000000000000000',
-            ],
-          },
-        ],
-      },
-      primaryType: 'Mail',
-      types: {
-        EIP712Domain: [
-          { name: 'name', type: 'string' },
-          { name: 'version', type: 'string' },
-          { name: 'chainId', type: 'uint256' },
-          { name: 'verifyingContract', type: 'address' },
-        ],
-        Group: [
-          { name: 'name', type: 'string' },
-          { name: 'members', type: 'Person[]' },
-        ],
-        Mail: [
-          { name: 'from', type: 'Person' },
-          { name: 'to', type: 'Person[]' },
-          { name: 'contents', type: 'string' },
-        ],
-        Person: [
-          { name: 'name', type: 'string' },
-          { name: 'wallets', type: 'address[]' },
-        ],
-      },
-    };
-    try {
-      const from = accounts[0];
-      const sign = signTypedDataV4Result.innerHTML;
-      const recoveredAddr = recoverTypedSignatureV4({
-        data: msgParams,
-        sig: sign,
-      });
-      if (toChecksumAddress(recoveredAddr) === toChecksumAddress(from)) {
-        console.log(`Successfully verified signer as ${recoveredAddr}`);
-        signTypedDataV4VerifyResult.innerHTML = recoveredAddr;
-      } else {
-        console.log(
-          `Failed to verify signer when comparing ${recoveredAddr} to ${from}`,
-        );
-      }
-    } catch (err) {
-      console.error(err);
-      signTypedDataV4VerifyResult.innerHTML = `Error: ${err.message}`;
-    }
-  };
-
-  function handleNewAccounts(newAccounts) {
-    accounts = newAccounts;
-    accountsDiv.innerHTML = accounts;
-    fromDiv.value = accounts;
-    gasPriceDiv.style.display = 'block';
-    maxFeeDiv.style.display = 'none';
-    maxPriorityDiv.style.display = 'none';
+  function handleNewAccounts (newAccounts) {
+    accounts = newAccounts
+    accountsDiv.innerHTML = accounts
     if (isMetaMaskConnected()) {
-      initializeAccountButtons();
+      initializeAccountButtons()
     }
-    updateButtons();
+    updateButtons()
   }
 
-  function handleNewChain(chainId) {
-    chainIdDiv.innerHTML = chainId;
-
-    if (chainId === '0x1') {
-      warningDiv.classList.remove('warning-invisible');
-    } else {
-      warningDiv.classList.add('warning-invisible');
-    }
+  function handleNewChain (chainId) {
+    chainIdDiv.innerHTML = chainId
   }
 
-  function handleEIP1559Support(supported) {
-    if (supported && Array.isArray(accounts) && accounts.length >= 1) {
-      sendEIP1559Button.disabled = false;
-      sendEIP1559Button.hidden = false;
-      sendButton.innerText = 'Send Legacy Transaction';
-    } else {
-      sendEIP1559Button.disabled = true;
-      sendEIP1559Button.hidden = true;
-      sendButton.innerText = 'Send';
-    }
+  function handleNewNetwork (networkId) {
+    networkDiv.innerHTML = networkId
   }
 
-  function handleNewNetwork(networkId) {
-    networkDiv.innerHTML = networkId;
-  }
-
-  async function getNetworkAndChainId() {
+  async function getNetworkAndChainId () {
     try {
       const chainId = await ethereum.request({
         method: 'eth_chainId',
-      });
-      handleNewChain(chainId);
+      })
+      handleNewChain(chainId)
 
       const networkId = await ethereum.request({
         method: 'net_version',
-      });
-      handleNewNetwork(networkId);
-
-      const block = await ethereum.request({
-        method: 'eth_getBlockByNumber',
-        params: ['latest', false],
-      });
-
-      handleEIP1559Support(block.baseFeePerGas !== undefined);
+      })
+      handleNewNetwork(networkId)
     } catch (err) {
-      console.error(err);
+      console.error(err)
     }
   }
 
-  updateButtons();
+  updateButtons()
 
   if (isMetaMaskInstalled()) {
-    ethereum.autoRefreshOnNetworkChange = false;
-    getNetworkAndChainId();
 
-    ethereum.autoRefreshOnNetworkChange = false;
-    getNetworkAndChainId();
+    ethereum.autoRefreshOnNetworkChange = false
+    getNetworkAndChainId()
 
-    ethereum.on('chainChanged', (chain) => {
-      handleNewChain(chain);
-      ethereum
-        .request({
-          method: 'eth_getBlockByNumber',
-          params: ['latest', false],
-        })
-        .then((block) => {
-          handleEIP1559Support(block.baseFeePerGas !== undefined);
-        });
-    });
-    ethereum.on('chainChanged', handleNewNetwork);
-    ethereum.on('accountsChanged', (newAccounts) => {
-      ethereum
-        .request({
-          method: 'eth_getBlockByNumber',
-          params: ['latest', false],
-        })
-        .then((block) => {
-          handleEIP1559Support(block.baseFeePerGas !== undefined);
-        });
-      handleNewAccounts(newAccounts);
-    });
+    ethereum.on('chainChanged', handleNewChain)
+    ethereum.on('networkChanged', handleNewNetwork)
+    ethereum.on('accountsChanged', handleNewAccounts)
 
     try {
       const newAccounts = await ethereum.request({
         method: 'eth_accounts',
-      });
-      handleNewAccounts(newAccounts);
+      })
+      handleNewAccounts(newAccounts)
     } catch (err) {
-      console.error('Error on init when getting accounts', err);
+      console.error('Error on init when getting accounts', err)
     }
   }
-};
+}
 
-window.addEventListener('load', initialize);
+window.addEventListener('DOMContentLoaded', initialize)
 
-// utils
-
-function getPermissionsDisplayString(permissionsArray) {
+function getPermissionsDisplayString (permissionsArray) {
   if (permissionsArray.length === 0) {
-    return 'No permissions found.';
+    return 'No permissions found.'
   }
-  const permissionNames = permissionsArray.map((perm) => perm.parentCapability);
-  return permissionNames
-    .reduce((acc, name) => `${acc}${name}, `, '')
-    .replace(/, $/u, '');
+  const permissionNames = permissionsArray.map((perm) => perm.parentCapability)
+  return permissionNames.reduce((acc, name) => `${acc}${name}, `, '').replace(/, $/u, '')
 }
 
-function stringifiableToHex(value) {
-  return ethers.utils.hexlify(Buffer.from(JSON.stringify(value)));
-}
-
-
-
-
-
-
-
-
-
-
-
-/******************* OLD WORKING CODE  **********************
-
-const forwarderOrigin = 'http://localhost:9010';
-
-const initialize = () => {
-  //Basic Actions Section
-  const onboardButton = document.getElementById('connectButton');
-  const getAccountsButton = document.getElementById('getAccounts');
-  const getAccountsResult = document.getElementById('getAccountsResult');
-
-  //Created check function to see if the MetaMask extension is installed
-  const isMetaMaskInstalled = () => {
-    //Have to check the ethereum binding on the window object to see if it's installed
-    const { ethereum } = window;
-    return Boolean(ethereum);
-  };
-
-  //We create a new MetaMask onboarding object to use in our app
-  const onboarding = new MetaMaskOnboarding({ forwarderOrigin });
-
-  //This will start the onboarding proccess
-  const onClickInstall = () => {
-    onboardButton.innerText = 'Web3 installation in progress';
-    onboardButton.disabled = true;
-    //On this object we have startOnboarding which will start the onboarding process for our end user
-    onboarding.startOnboarding();
-  };
-
-  const onClickConnect = async () => {
-    try {
-      // Will open the MetaMask UI
-      // You should disable this button while the request is pending!
-      await ethereum.request({ method: 'eth_requestAccounts' });
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  const MetaMaskClientCheck = () => {
-    //Now we check to see if Metmask is installed
-    if (!isMetaMaskInstalled()) {
-      //If it isn't installed we ask the user to click to install it
-      onboardButton.innerText = 'No web3 found -- Click to install MetaMask';
-      //When the button is clicked we call th is function
-      onboardButton.onclick = onClickInstall;
-      //The button is now disabled
-      onboardButton.disabled = false;
-    } else {
-      //If MetaMask is installed we ask the user to connect to their wallet
-      onboardButton.innerText = 'CONNECT-WALLET';
-      //When the button is clicked we call this function to connect the users MetaMask Wallet
-      onboardButton.onclick = onClickConnect;
-      //The button is now disabled
-      onboardButton.disabled = false;
-    }
-  };
-
-  //Eth_Accounts-getAccountsButton
-  getAccountsButton.addEventListener('click', async () => {
-    //we use eth_accounts because it returns a list of addresses owned by us.
-    const accounts = await ethereum.request({ method: 'eth_accounts' });
-    //We take the first address in the array of addresses and display it
-    getAccountsResult.innerHTML = accounts[0] || 'Unable to get accounts';
-  });
-
-  MetaMaskClientCheck();
-};
-
-window.addEventListener('DOMContentLoaded', initialize);
-*/
+// /////////////////////////////////////////////////////////// */

@@ -1,13 +1,12 @@
-const path = require('path');
-const { CleanWebpackPlugin } = require('clean-webpack-plugin');
-const CopyPlugin = require('copy-webpack-plugin');
+const path = require('path')
+const { CleanWebpackPlugin } = require('clean-webpack-plugin')
+const CopyPlugin = require('copy-webpack-plugin')
 
-const DIST = path.resolve(__dirname, 'dist');
+const DIST = path.resolve(__dirname, 'dist')
 
 module.exports = {
-  devtool: 'eval-source-map',
   mode: 'development',
-  entry: './src/index.js',
+  entry: './index.js',
   output: {
     filename: 'bundle.js',
     path: DIST,
@@ -34,4 +33,4 @@ module.exports = {
       ],
     }),
   ],
-};
+}
