@@ -1,0 +1,5 @@
+https://github.com/MetaMask/test-dapp
+
+https://github.com/s0crates-eth/web3
+
+https://github.com/BboyAkers/simple-dapp-tutorial
