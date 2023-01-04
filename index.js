@@ -1,3 +1,4 @@
+/*
 import MetaMaskOnboarding from '@metamask/onboarding';
 // eslint-disable-next-line camelcase
 import {
@@ -402,9 +403,7 @@ const initialize = async () => {
     }
     accountButtonsInitialized = true;
 
-    /**
-     * Piggy bank
-     */
+    // Piggy bank
 
     deployButton.onclick = async () => {
       contractStatus.innerHTML = 'Deploying';
@@ -451,9 +450,7 @@ const initialize = async () => {
       contractStatus.innerHTML = 'Withdrawn';
     };
 
-    /**
-     * Failing
-     */
+    // Failing
 
     deployFailingButton.onclick = async () => {
       failingContractStatus.innerHTML = 'Deploying';
@@ -501,9 +498,7 @@ const initialize = async () => {
       }
     };
 
-    /**
-     * ERC721 Token
-     */
+    // ERC721 Token
 
     deployCollectiblesButton.onclick = async () => {
       collectiblesStatus.innerHTML = 'Deploying';
@@ -604,9 +599,7 @@ const initialize = async () => {
       collectiblesStatus.innerHTML = 'Transfer From completed';
     };
 
-    /**
-     * Sending ETH
-     */
+    // Sending ETH
 
     sendButton.onclick = async () => {
       const result = await ethereum.request({
@@ -642,9 +635,7 @@ const initialize = async () => {
       console.log(result);
     };
 
-    /**
-     * ERC20 Token
-     */
+    // ERC20 Token
 
     createToken.onclick = async () => {
       const _initialAmount = 100;
@@ -742,9 +733,7 @@ const initialize = async () => {
       console.log('result', result);
     };
 
-    /**
-     * Permissions
-     */
+    // Permissions
 
     requestPermissionsButton.onclick = async () => {
       try {
@@ -786,9 +775,7 @@ const initialize = async () => {
       }
     };
 
-    /**
-     * Encrypt / Decrypt
-     */
+    // Encrypt / Decrypt
 
     getEncryptionKeyButton.onclick = async () => {
       try {
@@ -891,9 +878,8 @@ const initialize = async () => {
     console.log(result);
   };
 
-  /**
-   * eth_sign
-   */
+  // eth_sign
+
   ethSign.onclick = async () => {
     try {
       // const msg = 'Sample message to hash for signature'
@@ -911,9 +897,8 @@ const initialize = async () => {
     }
   };
 
-  /**
-   * Personal Sign
-   */
+  // Personal Sign
+
   personalSign.onclick = async () => {
     const exampleMessage = 'Example `personal_sign` message';
     try {
@@ -931,9 +916,7 @@ const initialize = async () => {
     }
   };
 
-  /**
-   * Sign In With Ethereum helper
-   */
+  // Sign In With Ethereum helper
 
   const siweSign = async (siweMessage) => {
     try {
@@ -950,9 +933,8 @@ const initialize = async () => {
     }
   };
 
-  /**
-   * Sign In With Ethereum
-   */
+  // Sign In With Ethereum
+
   siwe.onclick = async () => {
     const domain = window.location.host;
     const from = accounts[0];
@@ -960,9 +942,8 @@ const initialize = async () => {
     siweSign(siweMessage);
   };
 
-  /**
-   * Sign In With Ethereum (with Resources)
-   */
+  // Sign In With Ethereum (with Resources)
+
   siweResources.onclick = async () => {
     const domain = window.location.host;
     const from = accounts[0];
@@ -970,9 +951,8 @@ const initialize = async () => {
     siweSign(siweMessageResources);
   };
 
-  /**
-   * Sign In With Ethereum (Bad Domain)
-   */
+  // Sign In With Ethereum (Bad Domain)
+
   siweBadDomain.onclick = async () => {
     const domain = 'metamask.badactor.io';
     const from = accounts[0];
@@ -980,9 +960,8 @@ const initialize = async () => {
     siweSign(siweMessageBadDomain);
   };
 
-  /**
-   * Sign In With Ethereum (Bad Account)
-   */
+  // Sign In With Ethereum (Bad Account)
+
   siweBadAccount.onclick = async () => {
     const domain = window.location.host;
     const from = '0x0000000000000000000000000000000000000000';
@@ -990,9 +969,8 @@ const initialize = async () => {
     siweSign(siweMessageBadDomain);
   };
 
-  /**
-   * Sign In With Ethereum (Malformed)
-   */
+  // Sign In With Ethereum (Malformed)
+
   siweMalformed.onclick = async () => {
     const domain = window.location.host;
     const from = accounts[0];
@@ -1000,9 +978,8 @@ const initialize = async () => {
     siweSign(siweMessageMissing);
   };
 
-  /**
-   * Personal Sign Verify
-   */
+  // Personal Sign Verify
+
   personalSignVerify.onclick = async () => {
     const exampleMessage = 'Example `personal_sign` message';
     try {
@@ -1041,9 +1018,8 @@ const initialize = async () => {
     }
   };
 
-  /**
-   * Sign Typed Data Test
-   */
+  // Sign Typed Data Test
+
   signTypedData.onclick = async () => {
     const msgParams = [
       {
@@ -1071,9 +1047,8 @@ const initialize = async () => {
     }
   };
 
-  /**
-   * Sign Typed Data Verification
-   */
+  // Sign Typed Data Verification
+
   signTypedDataVerify.onclick = async () => {
     const msgParams = [
       {
@@ -1108,9 +1083,8 @@ const initialize = async () => {
     }
   };
 
-  /**
-   * Sign Typed Data Version 3 Test
-   */
+  // Sign Typed Data Version 3 Test
+
   signTypedDataV3.onclick = async () => {
     const networkId = parseInt(networkDiv.innerHTML, 10);
     const chainId = parseInt(chainIdDiv.innerHTML, 16) || networkId;
@@ -1166,9 +1140,8 @@ const initialize = async () => {
     }
   };
 
-  /**
-   * Sign Typed Data V3 Verification
-   */
+  // Sign Typed Data V3 Verification
+
   signTypedDataV3Verify.onclick = async () => {
     const networkId = parseInt(networkDiv.innerHTML, 10);
     const chainId = parseInt(chainIdDiv.innerHTML, 16) || networkId;
@@ -1231,9 +1204,8 @@ const initialize = async () => {
     }
   };
 
-  /**
-   * Sign Typed Data V4
-   */
+  // Sign Typed Data V4
+
   signTypedDataV4.onclick = async () => {
     const networkId = parseInt(networkDiv.innerHTML, 10);
     const chainId = parseInt(chainIdDiv.innerHTML, 16) || networkId;
@@ -1301,9 +1273,8 @@ const initialize = async () => {
     }
   };
 
-  /**
-   *  Sign Typed Data V4 Verification
-   */
+  // Sign Typed Data V4 Verification
+
   signTypedDataV4Verify.onclick = async () => {
     const networkId = parseInt(networkDiv.innerHTML, 10);
     const chainId = parseInt(chainIdDiv.innerHTML, 16) || networkId;
@@ -1501,3 +1472,230 @@ function getPermissionsDisplayString(permissionsArray) {
 function stringifiableToHex(value) {
   return ethers.utils.hexlify(Buffer.from(JSON.stringify(value)));
 }
+
+*/
+
+///////////////////////////////////////////////////////////////////////////////////////////
+
+import { ethers } from 'ethers';
+import MetaMaskOnboarding from '@metamask/onboarding';
+import {
+  piggybankBytecode,
+  piggybankAbi,
+} from './constants.json';
+
+
+const onboardButton = document.getElementById('connectButton');
+const getAccountsButton = document.getElementById('getAccounts');
+const getAccountsResults = document.getElementById('getAccountsResult');
+const deployButton = document.getElementById('deployButton');
+const depositButton = document.getElementById('depositButton');
+const withdrawButton = document.getElementById('withdrawButton');
+const contractStatus = document.getElementById('contractStatus');
+
+// ??
+const addEthereumChain = document.getElementById('addEthereumChain');
+const switchEthereumChain = document.getElementById('switchEthereumChain');
+
+let ethersProvider;
+
+//
+
+let piggybankFactory;
+let accounts;
+let accountButtonsInitialized = false;
+
+const isMetaMaskConnected = () => accounts && accounts.length > 0;
+
+const { isMetaMaskInstalled } = MetaMaskOnboarding;
+
+const currentUrl = new URL(window.location.href);
+const forwarderOrigin =
+  currentUrl.hostname === 'localhost' ? 'http://localhost:9010' : undefined;
+const urlSearchParams = new URLSearchParams(window.location.search);
+const deployedContractAddress = urlSearchParams.get('contract');
+
+const initialize = async () => {
+  try {
+    ethersProvider = new ethers.providers.Web3Provider(window.ethereum, 'any');
+    if (deployedContractAddress) {
+      // DELETE
+      piggybankContract = new ethers.Contract(
+        deployedContractAddress,
+        piggybankAbi,
+        ethersProvider.getSigner(),
+      );
+    }
+    piggybankFactory = new ethers.ContractFactory(
+      piggybankAbi,
+      piggybankBytecode,
+      ethersProvider.getSigner(),
+    );
+  } catch (error) {
+    console.error(error);
+}
+
+const onClickInstall = () => {
+  onboardButton.innerText = 'Onboarding in progress';
+  onboardButton.disabled = true;
+  onboarding.startOnboarding();
+};
+
+const onClickConnect = async () => {
+    try {
+      const newAccounts = await ethereum.request({
+        method: 'eth_requestAccounts',
+      });
+      handleNewAccounts(newAccounts);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+const accountButtons = [
+  deployButton,
+  depositButton,
+  withdrawButton
+  // a bunch of extra stuff was deleted
+];
+
+const updateButtons = () => {
+  const accountButtonsDisabled =
+    !isMetaMaskInstalled() || !isMetaMaskConnected();
+  if (accountButtonsDisabled) {
+    for (const button of accountButtons) {
+      button.disabled = true;
+    }
+    // DELETED
+  } else {
+    deployButton.disabled = false;
+    // DELETED
+  }
+
+  if (isMetaMaskInstalled()) {
+    addEthereumChain.disabled = false;
+    switchEthereumChain.disabled = false;
+  } else {
+    onboardButton.innerText = 'Click here to install MetaMask!';
+    onboardButton.onclick = onClickInstall;
+    onboardButton.disabled = false;
+  }
+
+  if (isMetaMaskConnected()) {
+    onboardButton.innerText = 'Connected';
+    onboardButton.disabled = true;
+    if (onboarding) {
+      onboarding.stopOnboarding();
+    }
+  } else {
+    onboardButton.innerText = 'Connect';
+    onboardButton.onclick = onClickConnect;
+    onboardButton.disabled = false;
+  }
+
+  if (deployedContractAddress) {
+    // Piggy bank contract
+    contractStatus.innerHTML = 'Deployed';
+    depositButton.disabled = false;
+    withdrawButton.disabled = false;
+
+    // DELETED
+  }
+};
+
+const initializeAccountButtons = () => {
+    if (accountButtonsInitialized) {
+      return;
+    }
+    accountButtonsInitialized = true;
+
+  getAccountsButton.onclick = async () => {
+    try {
+      const _accounts = await ethereum.request({
+        method: 'eth_accounts',
+      }); //wasnt able to find an import for this..
+      getAccountsResults.innerHTML =
+        _accounts[0] || 'Not able to get accounts';
+    } catch (err) {
+      console.error(err);
+      getAccountsResults.innerHTML = `Error: ${err.message}`;
+    }
+  };
+
+  deployButton.onclick = async () => {
+    contractStatus.innerHTML = 'Deploying';
+
+    try {
+      piggybankContract = await piggybankFactory.deploy();
+      await piggybankContract.deployTransaction.wait();
+    } catch (error) {
+      contractStatus.innerHTML = 'Deployment Failed';
+      throw error;
+    }
+
+    if (piggybankContract.address === undefined) {
+      return;
+    }
+
+    console.log(
+      `Contract mined! address: ${piggybankContract.address} transactionHash: ${piggybankContract.deployTransaction.hash}`,
+    );
+    contractStatus.innerHTML = 'Deployed';
+    depositButton.disabled = false;
+    withdrawButton.disabled = false;
+  };
+
+
+  depositButton.onclick = async () => {
+    contractStatus.innerHTML = 'Deposit initiated';
+    const result = await piggybankContract.deposit({
+      from: accounts[0],
+      value: '0x3782dace9d900000',
+    });
+    console.log(result);
+    const receipt = await result.wait();
+    console.log(receipt);
+    contractStatus.innerHTML = 'Deposit completed';
+  };
+
+  withdrawButton.onclick = async () => {
+    const result = await piggybankContract.withdraw('0xde0b6b3a7640000', {
+      from: accounts[0],
+    });
+    console.log(result);
+    const receipt = await result.wait();
+    console.log(receipt);
+    contractStatus.innerHTML = 'Withdrawn';
+  };
+};
+
+// ??
+
+addEthereumChain.onclick = async () => {
+  await ethereum.request({
+    method: 'wallet_addEthereumChain',
+    params: [
+      {
+        chainId: '0x53a',
+        rpcUrls: ['http://127.0.0.1:8546'],
+        chainName: 'Localhost 8546',
+        nativeCurrency: { name: 'TEST', decimals: 18, symbol: 'TEST' },
+        blockExplorerUrls: null,
+      },
+    ],
+  });
+};
+
+switchEthereumChain.onclick = async () => {
+  await ethereum.request({
+    method: 'wallet_switchEthereumChain',
+    params: [
+      {
+        chainId: '0x53a',
+      },
+    ],
+  });
+};
+
+window.addEventListener('load', initialize);
+
