@@ -1492,6 +1492,10 @@ const deployButton = document.getElementById('deployButton');
 const depositButton = document.getElementById('depositButton');
 const withdrawButton = document.getElementById('withdrawButton');
 const contractStatus = document.getElementById('contractStatus');
+const accountsDiv = document.getElementById('accounts');
+const gasPriceDiv = document.getElementById('gasPriceDiv');
+const maxFeeDiv = document.getElementById('maxFeeDiv');
+const maxPriorityDiv = document.getElementById('maxPriorityDiv');
 
 // ??
 const addEthereumChain = document.getElementById('addEthereumChain');
@@ -1531,170 +1535,184 @@ const initialize = async () => {
       piggybankBytecode,
       ethersProvider.getSigner(),
     );
-  } catch (error) {
+    } catch (error) {
     console.error(error);
-}
-
-const onClickInstall = () => {
-  onboardButton.innerText = 'Onboarding in progress';
-  onboardButton.disabled = true;
-  onboarding.startOnboarding();
-};
-
-const onClickConnect = async () => {
-    try {
-      const newAccounts = await ethereum.request({
-        method: 'eth_requestAccounts',
-      });
-      handleNewAccounts(newAccounts);
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-const accountButtons = [
-  deployButton,
-  depositButton,
-  withdrawButton
-  // a bunch of extra stuff was deleted
-];
-
-const updateButtons = () => {
-  const accountButtonsDisabled =
-    !isMetaMaskInstalled() || !isMetaMaskConnected();
-  if (accountButtonsDisabled) {
-    for (const button of accountButtons) {
-      button.disabled = true;
-    }
-    // DELETED
-  } else {
-    deployButton.disabled = false;
-    // DELETED
   }
 
-  if (isMetaMaskInstalled()) {
-    addEthereumChain.disabled = false;
-    switchEthereumChain.disabled = false;
-  } else {
-    onboardButton.innerText = 'Click here to install MetaMask!';
-    onboardButton.onclick = onClickInstall;
-    onboardButton.disabled = false;
-  }
-
-  if (isMetaMaskConnected()) {
-    onboardButton.innerText = 'Connected';
+  const onClickInstall = () => {
+    onboardButton.innerText = 'Onboarding in progress';
     onboardButton.disabled = true;
-    if (onboarding) {
-      onboarding.stopOnboarding();
+    onboarding.startOnboarding();
+  };
+
+  const onClickConnect = async () => {
+      try {
+        const newAccounts = await ethereum.request({
+          method: 'eth_requestAccounts',
+        });
+        handleNewAccounts(newAccounts);
+      } catch (error) {
+        console.error(error);
+      }
+  };
+
+  function handleNewAccounts(newAccounts) {
+    accounts = newAccounts;
+    accountsDiv.innerHTML = accounts;
+    fromDiv.value = accounts;
+    gasPriceDiv.style.display = 'block';
+    maxFeeDiv.style.display = 'none';
+    maxPriorityDiv.style.display = 'none';
+    if (isMetaMaskConnected()) {
+      initializeAccountButtons();
     }
-  } else {
-    onboardButton.innerText = 'Connect';
-    onboardButton.onclick = onClickConnect;
-    onboardButton.disabled = false;
+    updateButtons();
   }
 
-  if (deployedContractAddress) {
-    // Piggy bank contract
-    contractStatus.innerHTML = 'Deployed';
-    depositButton.disabled = false;
-    withdrawButton.disabled = false;
+  const accountButtons = [
+    deployButton,
+    depositButton,
+    withdrawButton
+    // a bunch of extra stuff was deleted
+  ];
 
-    // DELETED
-  }
-};
-
-const initializeAccountButtons = () => {
-    if (accountButtonsInitialized) {
-      return;
+  const updateButtons = () => {
+    const accountButtonsDisabled =
+      !isMetaMaskInstalled() || !isMetaMaskConnected();
+    if (accountButtonsDisabled) {
+      for (const button of accountButtons) {
+        button.disabled = true;
+      }
+      // DELETED
+    } else {
+      deployButton.disabled = false;
+      // DELETED
     }
-    accountButtonsInitialized = true;
 
-  getAccountsButton.onclick = async () => {
-    try {
-      const _accounts = await ethereum.request({
-        method: 'eth_accounts',
-      }); //wasnt able to find an import for this..
-      getAccountsResults.innerHTML =
-        _accounts[0] || 'Not able to get accounts';
-    } catch (err) {
-      console.error(err);
-      getAccountsResults.innerHTML = `Error: ${err.message}`;
+    if (isMetaMaskInstalled()) {
+      addEthereumChain.disabled = false;
+      switchEthereumChain.disabled = false;
+    } else {
+      onboardButton.innerText = 'Click here to install MetaMask!';
+      onboardButton.onclick = onClickInstall;
+      onboardButton.disabled = false;
+    }
+
+    if (isMetaMaskConnected()) {
+      onboardButton.innerText = 'Connected';
+      onboardButton.disabled = true;
+      if (onboarding) {
+        onboarding.stopOnboarding();
+      }
+    } else {
+      onboardButton.innerText = 'Connect';
+      onboardButton.onclick = onClickConnect;
+      onboardButton.disabled = false;
+    }
+
+    if (deployedContractAddress) {
+      // Piggy bank contract
+      contractStatus.innerHTML = 'Deployed';
+      depositButton.disabled = false;
+      withdrawButton.disabled = false;
+
+      // DELETED
     }
   };
 
-  deployButton.onclick = async () => {
-    contractStatus.innerHTML = 'Deploying';
+  const initializeAccountButtons = () => {
+      if (accountButtonsInitialized) {
+        return;
+      }
+      accountButtonsInitialized = true;
 
-    try {
-      piggybankContract = await piggybankFactory.deploy();
-      await piggybankContract.deployTransaction.wait();
-    } catch (error) {
-      contractStatus.innerHTML = 'Deployment Failed';
-      throw error;
-    }
+    getAccountsButton.onclick = async () => {
+      try {
+        const _accounts = await ethereum.request({
+          method: 'eth_accounts',
+        }); //wasnt able to find an import for this..
+        getAccountsResults.innerHTML =
+          _accounts[0] || 'Not able to get accounts';
+      } catch (err) {
+        console.error(err);
+        getAccountsResults.innerHTML = `Error: ${err.message}`;
+      }
+    };
 
-    if (piggybankContract.address === undefined) {
-      return;
-    }
+    deployButton.onclick = async () => {
+      contractStatus.innerHTML = 'Deploying';
 
-    console.log(
-      `Contract mined! address: ${piggybankContract.address} transactionHash: ${piggybankContract.deployTransaction.hash}`,
-    );
-    contractStatus.innerHTML = 'Deployed';
-    depositButton.disabled = false;
-    withdrawButton.disabled = false;
+      try {
+        piggybankContract = await piggybankFactory.deploy();
+        await piggybankContract.deployTransaction.wait();
+      } catch (error) {
+        contractStatus.innerHTML = 'Deployment Failed';
+        throw error;
+      }
+
+      if (piggybankContract.address === undefined) {
+        return;
+      }
+
+      console.log(
+        `Contract mined! address: ${piggybankContract.address} transactionHash: ${piggybankContract.deployTransaction.hash}`,
+      );
+      contractStatus.innerHTML = 'Deployed';
+      depositButton.disabled = false;
+      withdrawButton.disabled = false;
+    };
+
+
+    depositButton.onclick = async () => {
+      contractStatus.innerHTML = 'Deposit initiated';
+      const result = await piggybankContract.deposit({
+        from: accounts[0],
+        value: '0x3782dace9d900000',
+      });
+      console.log(result);
+      const receipt = await result.wait();
+      console.log(receipt);
+      contractStatus.innerHTML = 'Deposit completed';
+    };
+
+    withdrawButton.onclick = async () => {
+      const result = await piggybankContract.withdraw('0xde0b6b3a7640000', {
+        from: accounts[0],
+      });
+      console.log(result);
+      const receipt = await result.wait();
+      console.log(receipt);
+      contractStatus.innerHTML = 'Withdrawn';
+    };
   };
 
+  // can I delete this vvv ??
 
-  depositButton.onclick = async () => {
-    contractStatus.innerHTML = 'Deposit initiated';
-    const result = await piggybankContract.deposit({
-      from: accounts[0],
-      value: '0x3782dace9d900000',
+  addEthereumChain.onclick = async () => {
+    await ethereum.request({
+      method: 'wallet_addEthereumChain',
+      params: [
+        {
+          chainId: '0x53a',
+          rpcUrls: ['http://127.0.0.1:8546'],
+          chainName: 'Localhost 8546',
+          nativeCurrency: { name: 'TEST', decimals: 18, symbol: 'TEST' },
+          blockExplorerUrls: null,
+        },
+      ],
     });
-    console.log(result);
-    const receipt = await result.wait();
-    console.log(receipt);
-    contractStatus.innerHTML = 'Deposit completed';
   };
 
-  withdrawButton.onclick = async () => {
-    const result = await piggybankContract.withdraw('0xde0b6b3a7640000', {
-      from: accounts[0],
+  switchEthereumChain.onclick = async () => {
+    await ethereum.request({
+      method: 'wallet_switchEthereumChain',
+      params: [
+        {
+          chainId: '0x53a',
+        },
+      ],
     });
-    console.log(result);
-    const receipt = await result.wait();
-    console.log(receipt);
-    contractStatus.innerHTML = 'Withdrawn';
   };
-};
-
-// ??
-
-addEthereumChain.onclick = async () => {
-  await ethereum.request({
-    method: 'wallet_addEthereumChain',
-    params: [
-      {
-        chainId: '0x53a',
-        rpcUrls: ['http://127.0.0.1:8546'],
-        chainName: 'Localhost 8546',
-        nativeCurrency: { name: 'TEST', decimals: 18, symbol: 'TEST' },
-        blockExplorerUrls: null,
-      },
-    ],
-  });
-};
-
-switchEthereumChain.onclick = async () => {
-  await ethereum.request({
-    method: 'wallet_switchEthereumChain',
-    params: [
-      {
-        chainId: '0x53a',
-      },
-    ],
-  });
 };
 
 window.addEventListener('load', initialize);
