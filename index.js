@@ -1473,10 +1473,10 @@ function stringifiableToHex(value) {
   return ethers.utils.hexlify(Buffer.from(JSON.stringify(value)));
 }
 
-*/
-
 ///////////////////////////////////////////////////////////////////////////////////////////
 
+/*
+// IMPORT
 import { ethers } from 'ethers';
 import MetaMaskOnboarding from '@metamask/onboarding';
 import {
@@ -1484,7 +1484,7 @@ import {
   piggybankAbi,
 } from './constants.json';
 
-
+// CREATING VARS
 const onboardButton = document.getElementById('connectButton');
 const getAccountsButton = document.getElementById('getAccounts');
 const getAccountsResults = document.getElementById('getAccountsResult');
@@ -1497,63 +1497,58 @@ const gasPriceDiv = document.getElementById('gasPriceDiv');
 const maxFeeDiv = document.getElementById('maxFeeDiv');
 const maxPriorityDiv = document.getElementById('maxPriorityDiv');
 
-// ??
-const addEthereumChain = document.getElementById('addEthereumChain');
-const switchEthereumChain = document.getElementById('switchEthereumChain');
+const isMetaMaskConnected = () => accounts && accounts.length > 0;
+const { isMetaMaskInstalled } = MetaMaskOnboarding;
 
-let ethersProvider;
-
-//
+const currentUrl = new URL(window.location.href);
+const forwarderOrigin = currentUrl.hostname === 'localhost' ? 'http://localhost:9010' : undefined;
+const urlSearchParams = new URLSearchParams(window.location.search);
+const deployedContractAddress = urlSearchParams.get('contract');
 
 let piggybankFactory;
 let accounts;
 let accountButtonsInitialized = false;
+let ethersProvider;
 
-const isMetaMaskConnected = () => accounts && accounts.length > 0;
+// do I need these?
+const addEthereumChain = document.getElementById('addEthereumChain');
+const switchEthereumChain = document.getElementById('switchEthereumChain');
 
-const { isMetaMaskInstalled } = MetaMaskOnboarding;
+// FUNCTIONS
 
-const currentUrl = new URL(window.location.href);
-const forwarderOrigin =
-  currentUrl.hostname === 'localhost' ? 'http://localhost:9010' : undefined;
-const urlSearchParams = new URLSearchParams(window.location.search);
-const deployedContractAddress = urlSearchParams.get('contract');
+const initialize = async () => { 
+  // ^^ this function gets run on window load
 
-const initialize = async () => {
+  // AUTO RUN EVENTS
   try {
     ethersProvider = new ethers.providers.Web3Provider(window.ethereum, 'any');
+    // ^^ load up the windows web3 provider into a var
+    
     if (deployedContractAddress) {
-      // DELETE
+      //^^ load the contract address into a var if exists -- doesnt seem to be working???
       piggybankContract = new ethers.Contract(
         deployedContractAddress,
         piggybankAbi,
-        ethersProvider.getSigner(),
-      );
+        ethersProvider.getSigner(),);
     }
+
     piggybankFactory = new ethers.ContractFactory(
+      //^^ pull all the piggybank code and put it into a var
       piggybankAbi,
       piggybankBytecode,
-      ethersProvider.getSigner(),
-    );
-    } catch (error) {
-    console.error(error);
-  }
+      ethersProvider.getSigner(),);
+  } catch (error) {console.error(error);}
 
+  const accountButtons = [
+    deployButton,
+    depositButton,
+    withdrawButton
+  ];
+  
   const onClickInstall = () => {
     onboardButton.innerText = 'Onboarding in progress';
     onboardButton.disabled = true;
     onboarding.startOnboarding();
-  };
-
-  const onClickConnect = async () => {
-      try {
-        const newAccounts = await ethereum.request({
-          method: 'eth_requestAccounts',
-        });
-        handleNewAccounts(newAccounts);
-      } catch (error) {
-        console.error(error);
-      }
   };
 
   function handleNewAccounts(newAccounts) {
@@ -1569,24 +1564,26 @@ const initialize = async () => {
     updateButtons();
   }
 
-  const accountButtons = [
-    deployButton,
-    depositButton,
-    withdrawButton
-    // a bunch of extra stuff was deleted
-  ];
+  const onClickConnect = async () => {
+    try {
+      const newAccounts = await ethereum.request({
+        method: 'eth_requestAccounts',
+      });
+      handleNewAccounts(newAccounts);
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   const updateButtons = () => {
-    const accountButtonsDisabled =
-      !isMetaMaskInstalled() || !isMetaMaskConnected();
+    const accountButtonsDisabled = !isMetaMaskInstalled() || !isMetaMaskConnected();
+    
     if (accountButtonsDisabled) {
       for (const button of accountButtons) {
         button.disabled = true;
       }
-      // DELETED
     } else {
       deployButton.disabled = false;
-      // DELETED
     }
 
     if (isMetaMaskInstalled()) {
@@ -1716,4 +1713,4 @@ const initialize = async () => {
 };
 
 window.addEventListener('load', initialize);
-
+*/
