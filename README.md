@@ -1,5 +1,5 @@
 # FOR DEVELOPMENT PURPOSES ONLY
-https://img.shields.io/github/commit-activity/y/s0crates-eth/web3?color=orange&style=plastic
+<img alt="GitHub commit activity" src="https://img.shields.io/github/commit-activity/y/s0crates-eth/web3?color=orange&style=plastic">
 
 ## TODO:
 - Clear out all code that isnt BON official
