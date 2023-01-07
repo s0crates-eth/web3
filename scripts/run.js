@@ -1,4 +1,3 @@
-// this is compied from the scripts files
 const main = async () => {
     const nftContractFactory = await hre.ethers.getContractFactory('NowhereNFTs');
     const nftContract = await nftContractFactory.deploy();
@@ -9,10 +8,15 @@ const main = async () => {
     let txn = await nftContract.mintNowhereNFT()
     // Wait for it to be mined.
     await txn.wait()
-    console.log("Minted NNFT #1")
-};
   
-const runMain = async () => {
+    // Mint another NFT for fun.
+    txn = await nftContract.mintNowhereNFT()
+    // Wait for it to be mined.
+    await txn.wait()
+  
+  };
+  
+  const runMain = async () => {
     try {
       await main();
       process.exit(0);
@@ -20,9 +24,6 @@ const runMain = async () => {
       console.log(error);
       process.exit(1);
     }
-};
+  };
   
-mintButton.onclick = async () => {
-    runMain();
-    console.log("mint function");
-};
+  runMain();
