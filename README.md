@@ -1,11 +1,10 @@
 # **FOR DEVELOPMENT PURPOSES ONLY**
 <img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/s0crates-eth/web3?color=orange&label=s0c%20was%20here%3D%3E&style=plastic"> <img alt="GitHub commit activity" src="https://img.shields.io/github/commit-activity/y/s0crates-eth/web3?color=orange&label=commits%20so%20far%20%3D%3E&style=plastic">
 
-## **TODO**
-- NICE! This SHOULD post a button on the LIVESERVER site; when this button is clicked, then a TESTNET nft is minted to my dev account
+## **NOTES TO SELF**
+- when button is clicked, then a TESTNET nft is minted to my dev account
 - NOTE that this wouldnt work online because the private key is HIDDEN from github
-
-NOTE WORKING!!!!!
+- function doesnt work vvv
 > mint function
 > index.js:20 ReferenceError: hre is not defined
 >     at main (index.js:3:32)
