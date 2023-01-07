@@ -12,3 +12,18 @@
 - NFT staker dapp --- https://ethereum.stackexchange.com/questions/128135/how-do-you-create-a-staking-contract
 - nft minter tut --- https://github.com/buildspace/buildspace-projects/tree/main/NFT_Collection/en
 - nft minter --- https://www.web3.university/tracks/build-your-first-nft/building-a-full-stack-nft-dapp
+
+
+#### Sample Hardhat Project
+
+This project demonstrates a basic Hardhat use case. It comes with a sample contract, a test for that contract, and a script that deploys that contract.
+
+Try running some of the following tasks:
+
+```shell
+npx hardhat help
+npx hardhat test
+REPORT_GAS=true npx hardhat test
+npx hardhat node
+npx hardhat run scripts/deploy.js
+```
