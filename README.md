@@ -15,6 +15,7 @@ NOTE WORKING!!!!!
 >     at runMain (index.js:21:7)
 
 ## **RESOURCES**
+- https://mumbai.polygonscan.com/token/0x9FAf6E4545bb61108c50125E6E6A59cdf94739B1 // https://testnets.opensea.io/collection/nowhere-nfts
 - https://github.com/s0crates-eth/web3
 - bridge for RVLT&BON &CULT --- https://dapp-world.com/smartbook/transfer-erc20-token-from-polygon-to-ethereum--3pkq
 - multi sender ---  https://ethereum.stackexchange.com/questions/51513/doing-a-bulk-transaction-with-my-erc20-token-how-to-do-it
