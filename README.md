@@ -12,3 +12,4 @@
 - bridge for RVLT&BON &CULT --- https://dapp-world.com/smartbook/transfer-erc20-token-from-polygon-to-ethereum--3pkq
 - multi sender ---  https://ethereum.stackexchange.com/questions/51513/doing-a-bulk-transaction-with-my-erc20-token-how-to-do-it
 - NFT staker dapp --- https://ethereum.stackexchange.com/questions/128135/how-do-you-create-a-staking-contract
+- nft minter ---https://www.web3.university/tracks/build-your-first-nft/building-a-full-stack-nft-dapp
