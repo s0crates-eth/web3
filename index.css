@@ -106,10 +106,6 @@ ul {
       rgb(122, 235, 246) 0);
 }
 
-
-
-
-
 section {
   margin: 20px 0 20px 0;
 }
@@ -120,18 +116,6 @@ section {
 
 .full-width {
   width: 100%;
-}
-
-
-
-/* Encrypt/Decrypt */
-
-#encryptMessageInput {
-  margin-bottom: 1rem;
-}
-
-.error-div {
-  margin-bottom: 12px;
 }
 
 .error-message {
@@ -145,14 +129,7 @@ section {
   align-items: center;
   padding: 8px 10px;
 }
-.error-message-icon {
-  margin-right: 8px;
-  flex: 0 0 auto;
-}
+
 .error-message-text {
   overflow: auto;
-}
-
-.warning-invisible {
-  display: none;
 }
