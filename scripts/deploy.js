@@ -1,5 +1,5 @@
 const main = async () => {
-    const nftContractFactory = await hre.ethers.getContractFactory('NowhereNFTs');
+    const nftContractFactory = await hre.ethers.getContractFactory('NowhereNFT');
     const nftContract = await nftContractFactory.deploy();
     await nftContract.deployed();
     console.log("Contract deployed to:", nftContract.address);
@@ -8,12 +8,7 @@ const main = async () => {
     let txn = await nftContract.mintNowhereNFT()
     // Wait for it to be mined.
     await txn.wait()
-    console.log("Minted NNFT #1")
-  
-    txn = await nftContract.mintNowhereNFT()
-    // Wait for it to be mined.
-    await txn.wait()
-    console.log("Minted NNFT #2")
+    console.log("NNFT has been minted")
   };
   
   const runMain = async () => {
