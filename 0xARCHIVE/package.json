@@ -1,0 +1,32 @@
+{
+  "name": "web3",
+  "version": "1.0.0",
+  "description": "<img alt=\"GitHub last commit\" src=\"https://img.shields.io/github/last-commit/s0crates-eth/web3?color=orange&label=s0c%20was%20here%3D%3E&style=plastic\"> <img alt=\"GitHub commit activity\" src=\"https://img.shields.io/github/commit-activity/y/s0crates-eth/web3?color=orange&label=commits%20so%20far%20%3D%3E&style=plastic\">",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/s0crates-eth/web3.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/s0crates-eth/web3/issues"
+  },
+  "homepage": "https://github.com/s0crates-eth/web3#readme",
+  "devDependencies": {
+    "@nomicfoundation/hardhat-chai-matchers": "^1.0.5",
+    "@nomicfoundation/hardhat-toolbox": "^2.0.0",
+    "@nomiclabs/hardhat-ethers": "^2.2.1",
+    "chai": "^4.3.7",
+    "ethers": "^5.7.2",
+    "hardhat": "^2.12.5"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "^4.8.0",
+    "dotenv": "^16.0.3"
+  }
+}

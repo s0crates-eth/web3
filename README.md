@@ -3,6 +3,7 @@
 
 ## **TODO**
 - On Sec3 >> https://github.com/buildspace/buildspace-projects/tree/main/NFT_Collection/en/Section_3
+- I have archived all the old stuff to make room for the new // I also readded nodemodules to gitignore
 
 ## **WORKING NOTES**
 - I should finish this tut and then replace all the random word SVG stuff with custom code
